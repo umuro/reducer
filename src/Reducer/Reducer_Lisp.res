@@ -8,9 +8,9 @@ module Result = Belt.Result
 type lispValue = LV.lispValue
 
 type rec lispCode =
-| LcList(listOfLispCode)
-| LcValue(lispValue)
-| LcSymbol(string)
+| LcList(listOfLispCode)  // A list to map-reduce
+| LcValue(lispValue)      // Irreducable built-in value
+| LcSymbol(string)        // A symbol. Defined in local bindings
 and listOfLispCode = list<lispCode>
 type resultOfLispCode<'e> = result<lispCode, 'e>
 type resultOfListOfLispCode<'e> = result<listOfLispCode, 'e>
