@@ -1,0 +1,28 @@
+#Start(1646022735469)
+
+  Warning number 44
+  /home/umur/workspaces/hightechmind2020/upwork/rescript-reducer/src/ReducerExternal/ReducerExternal_LispLibrary.res:7:48-69
+
+  5 │     For an example of mapping polymorphic custom functions
+  6 │   */
+  7 │   let customAdd = (a:float, b:float):float => {open Belt.Float; a + b}
+  8 │ }
+  9 │ 
+
+  this open statement shadows the value identifier + (which is later used)
+
+
+  Warning number 39
+  /home/umur/workspaces/hightechmind2020/upwork/rescript-reducer/src/ReducerExternal/ReducerExternal_LispLibrary.res:13:9-16
+
+  11 │   Map external calls of Lisp Engine
+  12 │ */
+  13 │ let rec dispatch = (call: LV.functionCall, chain): result<LV.lispValue,
+     │  'e> => switch call {
+  14 │ 
+  15 │ |  ("add", [LvNumber(a), LvNumber(b)]) =>  Sample.customAdd(a, b)  -> L
+     │ vNumber -> Ok
+
+  unused rec flag.
+
+#Done(1646022735494)

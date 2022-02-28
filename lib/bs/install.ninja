@@ -1,0 +1,46 @@
+rescript = 1
+rule cp
+  command = cp $i $out
+rule touch
+ command = touch $out
+o Demo.cmi : cp ../bs/src/Demo.cmi
+o Demo.cmj : cp ../bs/src/Demo.cmj
+o Demo.cmt : cp ../bs/src/Demo.cmt
+o Demo.res : cp ../../src/Demo.res
+o ReducerExternal.cmi : cp ../bs/src/ReducerExternal/ReducerExternal.cmi
+o ReducerExternal.cmj : cp ../bs/src/ReducerExternal/ReducerExternal.cmj
+o ReducerExternal.cmt : cp ../bs/src/ReducerExternal/ReducerExternal.cmt
+o ReducerExternal.res : cp ../../src/ReducerExternal/ReducerExternal.res
+o ReducerExternal_LispValue.cmi : cp ../bs/src/ReducerExternal/ReducerExternal_LispValue.cmi
+o ReducerExternal_LispValue.cmj : cp ../bs/src/ReducerExternal/ReducerExternal_LispValue.cmj
+o ReducerExternal_LispValue.cmt : cp ../bs/src/ReducerExternal/ReducerExternal_LispValue.cmt
+o ReducerExternal_LispValue.res : cp ../../src/ReducerExternal/ReducerExternal_LispValue.res
+o ReducerExternal_LispLibrary.cmi : cp ../bs/src/ReducerExternal/ReducerExternal_LispLibrary.cmi
+o ReducerExternal_LispLibrary.cmj : cp ../bs/src/ReducerExternal/ReducerExternal_LispLibrary.cmj
+o ReducerExternal_LispLibrary.cmt : cp ../bs/src/ReducerExternal/ReducerExternal_LispLibrary.cmt
+o ReducerExternal_LispLibrary.res : cp ../../src/ReducerExternal/ReducerExternal_LispLibrary.res
+o Reducer.cmi : cp ../bs/src/Reducer/Reducer.cmi
+o Reducer.cmj : cp ../bs/src/Reducer/Reducer.cmj
+o Reducer.cmt : cp ../bs/src/Reducer/Reducer.cmt
+o Reducer.res : cp ../../src/Reducer/Reducer.res
+o Reducer_Lisp.cmi : cp ../bs/src/Reducer/Reducer_Lisp.cmi
+o Reducer_Lisp.cmj : cp ../bs/src/Reducer/Reducer_Lisp.cmj
+o Reducer_Lisp.cmt : cp ../bs/src/Reducer/Reducer_Lisp.cmt
+o Reducer_Lisp.res : cp ../../src/Reducer/Reducer_Lisp.res
+o Reducer_Debug.cmi : cp ../bs/src/Reducer/Reducer_Debug.cmi
+o Reducer_Debug.cmj : cp ../bs/src/Reducer/Reducer_Debug.cmj
+o Reducer_Debug.cmt : cp ../bs/src/Reducer/Reducer_Debug.cmt
+o Reducer_Debug.res : cp ../../src/Reducer/Reducer_Debug.res
+o Reducer_BuiltIn.cmi : cp ../bs/src/Reducer/Reducer_BuiltIn.cmi
+o Reducer_BuiltIn.cmj : cp ../bs/src/Reducer/Reducer_BuiltIn.cmj
+o Reducer_BuiltIn.cmt : cp ../bs/src/Reducer/Reducer_BuiltIn.cmt
+o Reducer_BuiltIn.res : cp ../../src/Reducer/Reducer_BuiltIn.res
+o Reducer_ListExt.cmi : cp ../bs/src/Reducer/Reducer_ListExt.cmi
+o Reducer_ListExt.cmj : cp ../bs/src/Reducer/Reducer_ListExt.cmj
+o Reducer_ListExt.cmt : cp ../bs/src/Reducer/Reducer_ListExt.cmt
+o Reducer_ListExt.res : cp ../../src/Reducer/Reducer_ListExt.res
+o Reducer_MathJsParse.cmi : cp ../bs/src/Reducer/Reducer_MathJsParse.cmi
+o Reducer_MathJsParse.cmj : cp ../bs/src/Reducer/Reducer_MathJsParse.cmj
+o Reducer_MathJsParse.cmt : cp ../bs/src/Reducer/Reducer_MathJsParse.cmt
+o Reducer_MathJsParse.res : cp ../../src/Reducer/Reducer_MathJsParse.res
+build install.stamp : touch Demo.cmi Demo.cmj ReducerExternal.cmi ReducerExternal.cmj ReducerExternal_LispValue.cmi ReducerExternal_LispValue.cmj ReducerExternal_LispLibrary.cmi ReducerExternal_LispLibrary.cmj Reducer.cmi Reducer.cmj Reducer_Lisp.cmi Reducer_Lisp.cmj Reducer_Debug.cmi Reducer_Debug.cmj Reducer_BuiltIn.cmi Reducer_BuiltIn.cmj Reducer_ListExt.cmi Reducer_ListExt.cmj Reducer_MathJsParse.cmi Reducer_MathJsParse.cmj 
