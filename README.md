@@ -1,7 +1,7 @@
 # Reducer
 
 Map MathJs parse tree to LISP and run LISP
-All syntatic sugar can be mapped to LIST. Therefore MathJs becomes a complete functional programming language
+All syntatic sugar can be mapped to LISP. Therefore MathJs becomes a complete functional programming language
 
 ## Installation
 
