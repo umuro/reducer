@@ -77,10 +77,15 @@ However this is optional. You can still opt for internal switch statements.
 To inherit or not? Are the switch statements all over the library? Then its time to refactor into inheriting modules
 
 ## TODO
+- Unit Testing - Error classes
 - Calling MathJs library for default implementations
+- Do the first integration at Least one function
+
+- variable definition // bindings // execution context
+
+==============
 - if then else
 - arrays
 - records
 - variable scope block
 - function definition
-- variable definition
