@@ -38,7 +38,7 @@ In addition to being fully functional. The current implementation is polymorphic
 
 In list all language features are provided by functions. If we need a language feature then it is a function. Bingo. No pattern matching and special logic required.
 
-An example of polymorphic function mapping is in ReducerExternal_LispLibrary.res
+An example of polymorphic function mapping is in ReducerExternal_ReducerLibrary.res
 
 An external function is called if and only if it's full type signature is matching. Thus polymorphic functions can be defined. Like
 - "hello " + "word"
@@ -46,7 +46,7 @@ An external function is called if and only if it's full type signature is matchi
 
 The search priority of functions will be in this order
 1. User space. Defined in the script
-2. Built-in extention. Look up for a mapping in ReducerExternal_LispLibrary.res
+2. Built-in extention. Look up for a mapping in ReducerExternal_ReducerLibrary.res
 3. MathJs built-in
 
 The whole map-reduce uses the Result monad. All run-time exceptions are converted to a Result monad. Because of this there is no need to look for patterns like n/0. Division by zero and all other exceptions enters the flow as a monad. If desired built-in functions can return a result monad also.

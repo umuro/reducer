@@ -1,5 +1,5 @@
 module LV = ReducerExternal.TreeValue
-module Lib = ReducerExternal.LispLibrary
+module Lib = ReducerExternal.ReducerLibrary
 /*
   MathJs provides default implementations for external calls
 */

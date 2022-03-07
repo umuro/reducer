@@ -1,2 +1,2 @@
-module LispLibrary = ReducerExternal_LispLibrary
+module ReducerLibrary = ReducerExternal_ReducerLibrary
 module TreeValue = ReducerExternal_TreeValue

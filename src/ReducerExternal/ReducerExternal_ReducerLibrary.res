@@ -8,7 +8,7 @@ module Sample = { // In real life real libraries should be somewhere else
 }
 
 /*
-  Map external calls of Lisp Engine
+  Map external calls of Reducer
 */
 let rec dispatch = (call: LV.functionCall, chain): result<LV.treeValue, 'e> => switch call {
 
