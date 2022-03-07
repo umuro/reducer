@@ -1,4 +1,4 @@
-module CT = ReducerExternal_TreeValue
+module CTV = ReducerExternal_CodeTreeValue
 
 module Sample = { // In real life real libraries should be somewhere else
   /*
@@ -10,9 +10,9 @@ module Sample = { // In real life real libraries should be somewhere else
 /*
   Map external calls of Reducer
 */
-let rec dispatch = (call: CT.functionCall, chain): result<CT.treeValue, 'e> => switch call {
+let rec dispatch = (call: CTV.functionCall, chain): result<CTV.codeTreeValue, 'e> => switch call {
 
-|  ("add", [TvNumber(a), TvNumber(b)]) =>  Sample.customAdd(a, b)  -> TvNumber -> Ok
+|  ("add", [CtvNumber(a), CtvNumber(b)]) =>  Sample.customAdd(a, b)  -> CtvNumber -> Ok
 
 |  call => chain(call)
 }

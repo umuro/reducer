@@ -1,38 +1,38 @@
 module MathJsParse = Reducer_MathJsParse
-module Lisp = Reducer_CodeTree
+module CodeTree = Reducer_CodeTree
 module ListExt = Reducer_ListExt
 
-module LV = ReducerExternal_TreeValue
+module CTV = ReducerExternal_CodeTreeValue
 
-let parse = (codeText:string):result<Lisp.codeTree, 'e> => codeText -> Lisp.parse
-let eval = (codeText:string):result<Lisp.treeValue, 'e> => codeText -> Lisp.eval
+let parse = (codeText:string):result<CodeTree.codeTree, 'e> => codeText -> CodeTree.parse
+let eval = (codeText:string):result<CodeTree.codeTreeValue, 'e> => codeText -> CodeTree.eval
 
 
 module Examples = {
   let examplesShow = ():unit => {
-    Js.log("Reducer.Lisp parse examples")
+    Js.log("Reducer.CodeTree parse examples")
 
     Js.log("case 1")
-    parse("1") ->  Lisp.showResult -> Js.log
+    parse("1") ->  CodeTree.showResult -> Js.log
     Js.log("case (1)")
-    parse("(1)") -> Lisp.showResult -> Js.log
+    parse("(1)") -> CodeTree.showResult -> Js.log
     Js.log("case 1+2")
-    parse("1+2") -> Lisp.showResult -> Js.log
+    parse("1+2") -> CodeTree.showResult -> Js.log
     Js.log("case add(1,2)")
-    parse("add(1,2)") -> Lisp.showResult -> Js.log
+    parse("add(1,2)") -> CodeTree.showResult -> Js.log
     Js.log("case 1+2*3")
-    parse("1+2*3") -> Lisp.showResult -> Js.log
+    parse("1+2*3") -> CodeTree.showResult -> Js.log
     ()
   }
 
   let examplesEval = ():unit =>  {
-    Js.log("Reducer.Lisp.eval examples")
+    Js.log("Reducer.CodeTree.eval examples")
     Js.log("case 1")
-    eval("1") -> LV.showResult -> Js.log
+    eval("1") -> CTV.showResult -> Js.log
     Js.log("case 1+2")
-    eval("1+2") -> LV.showResult -> Js.log
+    eval("1+2") -> CTV.showResult -> Js.log
     Js.log("case 1+(2+3)")
-    eval("1+(2+3)") -> LV.showResult -> Js.log
+    eval("1+(2+3)") -> CTV.showResult -> Js.log
     ()
   }
   let examples = ():unit => {

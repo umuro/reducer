@@ -1,15 +1,15 @@
-module TV = ReducerExternal.TreeValue
+module CTV = ReducerExternal.CodeTreeValue
 module BuiltIn = Reducer_BuiltIn
 module RLE = Reducer_ListExt
 module Dbg = Reducer_Debug
 
 module Result = Belt.Result
 
-type treeValue = TV.treeValue
+type codeTreeValue = CTV.codeTreeValue
 
 type rec codeTree =
 | CtList(listOfCodeTree)  // A list to map-reduce
-| CtValue(treeValue)      // Irreducable built-in value
+| CtValue(codeTreeValue)      // Irreducable built-in value. Reducer should not know the internals
 | CtSymbol(string)        // A symbol. Defined in local bindings
 and listOfCodeTree = list<codeTree>
 type resultOfCodeTree<'e> = result<codeTree, 'e>
@@ -31,9 +31,9 @@ module MJ = Reducer_MathJsParse
 // SymbolNode
 let rec fromNode = (node: MJ.node): resultOfCodeTree<'e> => switch node["type"] {
 | "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
-  | MJ.ExnNumber(x) => x -> TV.TvNumber -> CtValue -> Ok
-  | MJ.ExnString(x) => x -> TV.TvString -> CtValue -> Ok
-  | MJ.ExnBool(x) => x -> TV.TvBool -> CtValue -> Ok
+  | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
+  | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
+  | MJ.ExnBool(x) => x -> CTV.CtvBool -> CtValue -> Ok
   | MJ.ExnUnknown => "Unhandled MathJs constantNode value" -> Error
   }
 | "FunctionNode" => {
@@ -77,7 +77,7 @@ let rec show = codeTree => switch codeTree {
     -> Belt.List.toArray -> Js.String.concatMany(""))
   ++ ")"
 | CtSymbol(aSymbol) => ":" ++ aSymbol
-| CtValue(aValue) => TV.show(aValue)
+| CtValue(aValue) => CTV.show(aValue)
 }
 
 let showResult = (codeResult) => switch codeResult {
@@ -99,11 +99,11 @@ let defaultBindings: bindings = MapString.fromArray([])
 
 let execFunctionCall = ( lisp: listOfCodeTree, _bindings ): result<codeTree, 'e> => {
 
-  let stripArgs = (args): list<TV.treeValue> =>
+  let stripArgs = (args): list<CTV.codeTreeValue> =>
     Belt.List.map(args, a =>
       switch a {
         | CtValue(aValue) => aValue
-        | _ => TV.TvUndefined
+        | _ => CTV.CtvUndefined
       })
 
   if Js.List.isEmpty( lisp ) {
@@ -112,7 +112,7 @@ let execFunctionCall = ( lisp: listOfCodeTree, _bindings ): result<codeTree, 'e>
     switch List.hd( lisp ) {
     | CtSymbol(fname) => {
         let aCall = (fname, List.tl(lisp)->stripArgs->Belt.List.toArray )
-        // Ok(CtValue(TV.TvString("result_of_fname")))
+        // Ok(CtValue(CTV.CtvString("result_of_fname")))
         Result.map( BuiltIn.dispatch(aCall), aValue => CtValue(aValue))
       }
     | _ => Error("TODO User space functions not yet allowed")
@@ -138,7 +138,7 @@ and let execLispList = ( list: listOfCodeTree, bindings ) => {
   -> Result.flatMap(aList => execFunctionCall(aList, bindings))
 }
 
-let evalWBindingsCodeTree = (aCodeTree, bindings): result<treeValue, 'e> =>
+let evalWBindingsCodeTree = (aCodeTree, bindings): result<codeTreeValue, 'e> =>
   Result.flatMap( execCodeTree(aCodeTree, bindings),
   aCode => switch aCode {
     | CtValue( aValue ) => aValue -> Ok
