@@ -11,14 +11,13 @@ npm install
 
 ## Build
 
-- Build: `npm run build`
-- Clean: `npm run clean`
-- Build & watch: `npm run start`
+- Build: `yarn build`
+- Clean: `yarn clean`
 
 ## Run
 
 ```sh
-node src/Demo.bs.js
+yarn run main
 ```
 
 ## Notes
