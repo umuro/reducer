@@ -5,6 +5,7 @@
     "build": "rescript",
     "clean": "rescript clean -with-deps",
     "start": "rescript build -w",
+    "test": "jest",
     "main": "node lib/js/src/Demo.bs.js"
   },
   "keywords": [
@@ -15,5 +16,12 @@
   "dependencies": {
     "mathjs": "^10.1.1",
     "rescript": "*"
+  },
+  "devDependencies": {
+    "@babel/core": "*",
+    "@babel/preset-env": "*",
+    "@glennsl/rescript-jest": "^0.9.0",
+    "babel-jest": "*",
+    "jest": "^27.5.1"
   }
 }
