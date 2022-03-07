@@ -12,7 +12,7 @@ module Sample = { // In real life real libraries should be somewhere else
 */
 let rec dispatch = (call: LV.functionCall, chain): result<LV.treeValue, 'e> => switch call {
 
-|  ("add", [LvNumber(a), LvNumber(b)]) =>  Sample.customAdd(a, b)  -> LvNumber -> Ok
+|  ("add", [TvNumber(a), TvNumber(b)]) =>  Sample.customAdd(a, b)  -> TvNumber -> Ok
 
 |  call => chain(call)
 }

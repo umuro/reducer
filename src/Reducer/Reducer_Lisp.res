@@ -31,9 +31,9 @@ module MJ = Reducer_MathJsParse
 // SymbolNode
 let rec fromNode = (node: MJ.node): resultOfLispCode<'e> => switch node["type"] {
 | "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
-  | MJ.ExnNumber(x) => x -> LV.LvNumber -> LcValue -> Ok
-  | MJ.ExnString(x) => x -> LV.LvString -> LcValue -> Ok
-  | MJ.ExnBool(x) => x -> LV.LvBool -> LcValue -> Ok
+  | MJ.ExnNumber(x) => x -> LV.TvNumber -> LcValue -> Ok
+  | MJ.ExnString(x) => x -> LV.TvString -> LcValue -> Ok
+  | MJ.ExnBool(x) => x -> LV.TvBool -> LcValue -> Ok
   | MJ.ExnUnknown => "Unhandled MathJs constantNode value" -> Error
   }
 | "FunctionNode" => {
@@ -103,7 +103,7 @@ let execFunctionCall = ( lisp: listOfLispCode, _bindings ): result<lispCode, 'e>
     Belt.List.map(args, a =>
       switch a {
         | LcValue(aValue) => aValue
-        | _ => LV.LvUndefined
+        | _ => LV.TvUndefined
       })
 
   if Js.List.isEmpty( lisp ) {
@@ -112,7 +112,7 @@ let execFunctionCall = ( lisp: listOfLispCode, _bindings ): result<lispCode, 'e>
     switch List.hd( lisp ) {
     | LcSymbol(fname) => {
         let aCall = (fname, List.tl(lisp)->stripArgs->Belt.List.toArray )
-        // Ok(LcValue(LV.LvString("result_of_fname")))
+        // Ok(LcValue(LV.TvString("result_of_fname")))
         Result.map( BuiltIn.dispatch(aCall), aValue => LcValue(aValue))
       }
     | _ => Error("TODO User space functions not yet allowed")
