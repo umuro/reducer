@@ -1,15 +1,15 @@
-module LV = ReducerExternal.LispValue
+module LV = ReducerExternal.TreeValue
 module BuiltIn = Reducer_BuiltIn
 module RLE = Reducer_ListExt
 module Dbg = Reducer_Debug
 
 module Result = Belt.Result
 
-type lispValue = LV.lispValue
+type treeValue = LV.treeValue
 
 type rec lispCode =
 | LcList(listOfLispCode)  // A list to map-reduce
-| LcValue(lispValue)      // Irreducable built-in value
+| LcValue(treeValue)      // Irreducable built-in value
 | LcSymbol(string)        // A symbol. Defined in local bindings
 and listOfLispCode = list<lispCode>
 type resultOfLispCode<'e> = result<lispCode, 'e>
@@ -99,7 +99,7 @@ let defaultBindings: bindings = MapString.fromArray([])
 
 let execFunctionCall = ( lisp: listOfLispCode, _bindings ): result<lispCode, 'e> => {
 
-  let stripArgs = (args): list<LV.lispValue> =>
+  let stripArgs = (args): list<LV.treeValue> =>
     Belt.List.map(args, a =>
       switch a {
         | LcValue(aValue) => aValue
@@ -138,7 +138,7 @@ and let execLispList = ( list: listOfLispCode, bindings ) => {
   -> Result.flatMap(aList => execFunctionCall(aList, bindings))
 }
 
-let evalWBindingsLispCode = (aLispCode, bindings): result<lispValue, 'e> =>
+let evalWBindingsLispCode = (aLispCode, bindings): result<treeValue, 'e> =>
   Result.flatMap( execLispCode(aLispCode, bindings),
   aCode => switch aCode {
     | LcValue( aValue ) => aValue -> Ok

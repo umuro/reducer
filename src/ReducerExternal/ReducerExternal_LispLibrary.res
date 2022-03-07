@@ -1,4 +1,4 @@
-module LV = ReducerExternal_LispValue
+module LV = ReducerExternal_TreeValue
 
 module Sample = { // In real life real libraries should be somewhere else
   /*
@@ -10,7 +10,7 @@ module Sample = { // In real life real libraries should be somewhere else
 /*
   Map external calls of Lisp Engine
 */
-let rec dispatch = (call: LV.functionCall, chain): result<LV.lispValue, 'e> => switch call {
+let rec dispatch = (call: LV.functionCall, chain): result<LV.treeValue, 'e> => switch call {
 
 |  ("add", [LvNumber(a), LvNumber(b)]) =>  Sample.customAdd(a, b)  -> LvNumber -> Ok
 

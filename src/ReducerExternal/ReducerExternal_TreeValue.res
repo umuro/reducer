@@ -1,10 +1,10 @@
-type lispValue =
+type treeValue =
 | LvBool(bool)
 | LvNumber(float)
 | LvString(string)
 | LvUndefined
 
-type functionCall  = (string, array<lispValue>)
+type functionCall  = (string, array<treeValue>)
 
 let show = aValue => switch aValue {
   | LvBool( aBool ) => Js.String.make( aBool )

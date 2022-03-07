@@ -1,4 +1,4 @@
-module LV = ReducerExternal.LispValue
+module LV = ReducerExternal.TreeValue
 module Lib = ReducerExternal.LispLibrary
 /*
   MathJs provides default implementations for external calls
@@ -9,7 +9,7 @@ let callMatjJs = (_functionCall) =>
 /*
   Lisp engine uses Result monad while reducing expressions
 */
-let dispatch = (call: LV.functionCall): result<LV.lispValue, 'e> =>
+let dispatch = (call: LV.functionCall): result<LV.treeValue, 'e> =>
   try {
     Lib.dispatch(call, callMatjJs)
   } catch {
