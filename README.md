@@ -1,7 +1,7 @@
 # Reducer
 
-Map MathJs parse tree to LISP and run LISP
-All syntatic sugar can be mapped to LISP. Therefore MathJs becomes a complete functional programming language
+Map MathJs parse tree to LISP-like code tree and reduce (run) the code tree to an answer
+CodeTree is LISP inspired. All syntatic sugar can be mapped to LISP. Therefore MathJs becomes a complete functional programming language
 
 ## Installation
 
@@ -22,9 +22,9 @@ yarn run main
 
 ## Notes
 
-LISP is the most basic functional language. It has no syntax sugar. It's evaluated by using map-reduce. However it's a complete language. Any syntax sugar in any language can be expressed in LISP.
+LISP is the most basic functional language. It has no syntax sugar. It's evaluated by using map-reduce. However it's a complete language. Any syntax sugar in any language can be expressed in LISP. Actually, LISP is just a code tree. There is nothing else. Code Tree here is reduced similar to list but unlike the original LISP, it is aggressive to resolve the external calls as soon as possible.
 
-Here I map MathJs parser to LISP. Thus MathJs scripts will become a complete functional language. The LISP map-reduce is in place. However, not all MathJs nodes are mapped yet. To do List:
+Here I map MathJs parser to code tree. Thus MathJs scripts will become a complete functional language. The code tree map-reduce is in place. However, not all MathJs nodes are mapped yet. To do List:
 - if then else
 - arrays
 - records
@@ -32,11 +32,9 @@ Here I map MathJs parser to LISP. Thus MathJs scripts will become a complete fun
 - variable definition
 - variable scope block
 
-The remaining work is actually trivial. Maybe 3-4 hours of unit testing per node type.
+In addition to being fully functional. The current implementation is polymorphic. The original MathJs parser is not polymorphic. This protects one from writing dispatch modules and type handling while providing external libraries.
 
-In addition to being fully functional. The current implementation is polymorphic. The original MathJs parser is not polymorphic.
-
-In list all language features are provided by functions. If we need a language feature then it is a function. Bingo. No pattern matching and special logic required.
+Like LISP, all language features are provided by functions. If we need a language feature then it is a function. Bingo. No modification to the code tree is required.
 
 An example of polymorphic function mapping is in ReducerExternal_ReducerLibrary.res
 
@@ -46,10 +44,11 @@ An external function is called if and only if it's full type signature is matchi
 
 The search priority of functions will be in this order
 1. User space. Defined in the script
-2. Built-in extention. Look up for a mapping in ReducerExternal_ReducerLibrary.res
-3. MathJs built-in
+2. Built-in extension. Special domains to extend the Reducer. Look up for a mapping in ReducerExternal_ReducerLibrary.res
+3. Very Basic built-ins not provided by MathJs library. If they are very basic to computer languages in general.
+4. MathJs built-in
 
-The whole map-reduce uses the Result monad. All run-time exceptions are converted to a Result monad. Because of this there is no need to look for patterns like n/0. Division by zero and all other exceptions enters the flow as a monad. If desired built-in functions can return a result monad also.
+The whole tree code map-reduce uses the Result monad. All run-time exceptions are converted to a Result monad. Because of this there is no need to look for patterns like n/0. Division by zero and all other exceptions enters the flow as a monad. If desired built-in functions can return a result monad also.
 
 ## Examples
 module Reducer.Examples contains examples of parsing and evaluating. To execute run Demo.res
