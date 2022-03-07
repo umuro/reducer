@@ -1,10 +1,10 @@
 module MathJsParse = Reducer_MathJsParse
-module Lisp = Reducer_Lisp
+module Lisp = Reducer_CodeTree
 module ListExt = Reducer_ListExt
 
 module LV = ReducerExternal_TreeValue
 
-let parse = (codeText:string):result<Lisp.lispCode, 'e> => codeText -> Lisp.parse
+let parse = (codeText:string):result<Lisp.codeTree, 'e> => codeText -> Lisp.parse
 let eval = (codeText:string):result<Lisp.treeValue, 'e> => codeText -> Lisp.eval
 
 

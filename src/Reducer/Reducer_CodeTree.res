@@ -1,19 +1,19 @@
-module LV = ReducerExternal.TreeValue
+module TV = ReducerExternal.TreeValue
 module BuiltIn = Reducer_BuiltIn
 module RLE = Reducer_ListExt
 module Dbg = Reducer_Debug
 
 module Result = Belt.Result
 
-type treeValue = LV.treeValue
+type treeValue = TV.treeValue
 
-type rec lispCode =
-| LcList(listOfLispCode)  // A list to map-reduce
-| LcValue(treeValue)      // Irreducable built-in value
-| LcSymbol(string)        // A symbol. Defined in local bindings
-and listOfLispCode = list<lispCode>
-type resultOfLispCode<'e> = result<lispCode, 'e>
-type resultOfListOfLispCode<'e> = result<listOfLispCode, 'e>
+type rec codeTree =
+| CtList(listOfCodeTree)  // A list to map-reduce
+| CtValue(treeValue)      // Irreducable built-in value
+| CtSymbol(string)        // A symbol. Defined in local bindings
+and listOfCodeTree = list<codeTree>
+type resultOfCodeTree<'e> = result<codeTree, 'e>
+type resultOfListOfCodeTree<'e> = result<listOfCodeTree, 'e>
 
 module MJ = Reducer_MathJsParse
 
@@ -29,26 +29,26 @@ module MJ = Reducer_MathJsParse
 // RangeNode
 // RelationalNode
 // SymbolNode
-let rec fromNode = (node: MJ.node): resultOfLispCode<'e> => switch node["type"] {
+let rec fromNode = (node: MJ.node): resultOfCodeTree<'e> => switch node["type"] {
 | "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
-  | MJ.ExnNumber(x) => x -> LV.TvNumber -> LcValue -> Ok
-  | MJ.ExnString(x) => x -> LV.TvString -> LcValue -> Ok
-  | MJ.ExnBool(x) => x -> LV.TvBool -> LcValue -> Ok
+  | MJ.ExnNumber(x) => x -> TV.TvNumber -> CtValue -> Ok
+  | MJ.ExnString(x) => x -> TV.TvString -> CtValue -> Ok
+  | MJ.ExnBool(x) => x -> TV.TvBool -> CtValue -> Ok
   | MJ.ExnUnknown => "Unhandled MathJs constantNode value" -> Error
   }
 | "FunctionNode" => {
     let fNode = node -> MJ.castFunctionNode
-    let lispName = fNode["fn"] -> LcSymbol
+    let lispName = fNode["fn"] -> CtSymbol
     let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
     lispArgs
-    -> Result.map( aList => list{lispName, ...aList} -> LcList )
+    -> Result.map( aList => list{lispName, ...aList} -> CtList )
   }
 | "OperatorNode" => {
   let fNode = node -> MJ.castOperatorNode
-  let lispName = fNode["fn"] -> LcSymbol
+  let lispName = fNode["fn"] -> CtSymbol
   let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
   lispArgs
-  -> Result.map( aList => list{lispName, ...aList} -> LcList )
+  -> Result.map( aList => list{lispName, ...aList} -> CtList )
 }
 | "ParenthesisNode" => {
   let pNode = node -> MJ.castParanthesisNode
@@ -57,7 +57,7 @@ let rec fromNode = (node: MJ.node): resultOfLispCode<'e> => switch node["type"] 
 
 | aNodeType => Error("TODO MathJs Node Type: " ++ aNodeType)
 }
-and let fromNodeList = (nodeList: list<MJ.node>): resultOfListOfLispCode <'e> =>
+and let fromNodeList = (nodeList: list<MJ.node>): resultOfListOfCodeTree <'e> =>
   Belt.List.reduce(nodeList, Ok(list{}), (racc, currNode) =>
     racc
       -> Result.flatMap( acc =>
@@ -70,14 +70,14 @@ and let fromNodeList = (nodeList: list<MJ.node>): resultOfListOfLispCode <'e> =>
 /*
   Shows the Lisp Code as text lisp code
 */
-let rec show = lispCode => switch lispCode {
-| LcList(aList) => "("
+let rec show = codeTree => switch codeTree {
+| CtList(aList) => "("
   ++ (Belt.List.map(aList, aValue => show(aValue))
     -> RLE.interperse(" ")
     -> Belt.List.toArray -> Js.String.concatMany(""))
   ++ ")"
-| LcSymbol(aSymbol) => ":" ++ aSymbol
-| LcValue(aValue) => LV.show(aValue)
+| CtSymbol(aSymbol) => ":" ++ aSymbol
+| CtValue(aValue) => TV.show(aValue)
 }
 
 let showResult = (codeResult) => switch codeResult {
@@ -88,7 +88,7 @@ let showResult = (codeResult) => switch codeResult {
 /*
   Converts a MathJs code to Lisp Code
 */
-let parse = (mathJsCode: string): resultOfLispCode<'e> =>
+let parse = (mathJsCode: string): resultOfCodeTree<'e> =>
   mathJsCode -> MJ.parse -> Result.flatMap(node => fromNode(node))
 
 
@@ -97,23 +97,23 @@ type bindings = MapString.t<unit>
 let defaultBindings: bindings = MapString.fromArray([])
 // TODO Define bindings for function execution context
 
-let execFunctionCall = ( lisp: listOfLispCode, _bindings ): result<lispCode, 'e> => {
+let execFunctionCall = ( lisp: listOfCodeTree, _bindings ): result<codeTree, 'e> => {
 
-  let stripArgs = (args): list<LV.treeValue> =>
+  let stripArgs = (args): list<TV.treeValue> =>
     Belt.List.map(args, a =>
       switch a {
-        | LcValue(aValue) => aValue
-        | _ => LV.TvUndefined
+        | CtValue(aValue) => aValue
+        | _ => TV.TvUndefined
       })
 
   if Js.List.isEmpty( lisp ) {
     Error("Function expected; got nothing")
   } else {
     switch List.hd( lisp ) {
-    | LcSymbol(fname) => {
+    | CtSymbol(fname) => {
         let aCall = (fname, List.tl(lisp)->stripArgs->Belt.List.toArray )
-        // Ok(LcValue(LV.TvString("result_of_fname")))
-        Result.map( BuiltIn.dispatch(aCall), aValue => LcValue(aValue))
+        // Ok(CtValue(TV.TvString("result_of_fname")))
+        Result.map( BuiltIn.dispatch(aCall), aValue => CtValue(aValue))
       }
     | _ => Error("TODO User space functions not yet allowed")
     }
@@ -121,15 +121,15 @@ let execFunctionCall = ( lisp: listOfLispCode, _bindings ): result<lispCode, 'e>
 
 }
 
-let rec execLispCode = (aLispCode, bindings): result<lispCode, 'e> => switch aLispCode {
-  | LcList( aList ) => execLispList( aList, bindings )
+let rec execCodeTree = (aCodeTree, bindings): result<codeTree, 'e> => switch aCodeTree {
+  | CtList( aList ) => execLispList( aList, bindings )
   | x => x -> Ok
 }
-and let execLispList = ( list: listOfLispCode, bindings ) => {
+and let execLispList = ( list: listOfCodeTree, bindings ) => {
   Belt.List.reduce(list, Ok(list{}), (racc, currCode) =>
   racc
     -> Result.flatMap( acc =>
-      execLispCode(currCode, bindings)
+      execCodeTree(currCode, bindings)
         -> Result.map(newCode => list{newCode, ...acc}
         )
     )
@@ -138,10 +138,10 @@ and let execLispList = ( list: listOfLispCode, bindings ) => {
   -> Result.flatMap(aList => execFunctionCall(aList, bindings))
 }
 
-let evalWBindingsLispCode = (aLispCode, bindings): result<treeValue, 'e> =>
-  Result.flatMap( execLispCode(aLispCode, bindings),
+let evalWBindingsCodeTree = (aCodeTree, bindings): result<treeValue, 'e> =>
+  Result.flatMap( execCodeTree(aCodeTree, bindings),
   aCode => switch aCode {
-    | LcValue( aValue ) => aValue -> Ok
+    | CtValue( aValue ) => aValue -> Ok
     | other => ("Unexecuted code remaining: "++ show(other)) -> Error
   }
 )
@@ -150,7 +150,7 @@ let evalWBindingsLispCode = (aLispCode, bindings): result<treeValue, 'e> =>
   Evaluates MathJs code via Lisp using bindings and answers the result
 */
 let evalWBindings = (codeText:string, bindings: bindings) => {
-  parse(codeText) -> Result.flatMap(code => code -> evalWBindingsLispCode(bindings))
+  parse(codeText) -> Result.flatMap(code => code -> evalWBindingsCodeTree(bindings))
 }
 
 /*
