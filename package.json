@@ -6,6 +6,7 @@
     "clean": "rescript clean -with-deps",
     "start": "rescript build -w",
     "test": "jest",
+    "coverage": "jest --coverage",
     "main": "node lib/js/src/Demo.bs.js"
   },
   "keywords": [

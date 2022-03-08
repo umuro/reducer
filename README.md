@@ -24,6 +24,7 @@ yarn run main
 
 ```sh
 yarn test
+yarn coverage
 ```
 
 ## Usage
