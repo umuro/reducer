@@ -2,6 +2,7 @@
   Irreducable values. Reducer does not know about those. Only used for external calls
   This is a configuration to to make external calls of those types
 */
+module Rerr = Reducer_Error
 
 type codeTreeValue =
 | CtvBool(bool)
@@ -20,5 +21,5 @@ let show = aValue => switch aValue {
 
 let showResult = (x) => switch x {
   | Ok(a) => "Ok("++ show(a)++")"
-  | Error(m) => "Error("++ Js.String.make(m) ++")"
+  | Error(m) => "Error("++ Rerr.showError(m) ++")"
 }

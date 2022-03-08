@@ -2,6 +2,7 @@ module CTV = ReducerExternal.CodeTreeValue
 module BuiltIn = Reducer_BuiltIn
 module RLE = Reducer_ListExt
 module Dbg = Reducer_Debug
+module Rerr = Reducer_Error
 
 module Result = Belt.Result
 
@@ -26,12 +27,13 @@ module MJ = Reducer_MathJsParse
 // RangeNode
 // RelationalNode
 // SymbolNode
-let rec fromNode = (node: MJ.node): result<codeTree, 'e> => switch node["type"] {
+let rec fromNode =
+  (node: MJ.node): result<codeTree, Rerr.reducerError> => switch node["type"] {
 | "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
   | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
   | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
   | MJ.ExnBool(x) => x -> CTV.CtvBool -> CtValue -> Ok
-  | MJ.ExnUnknown => "Unhandled MathJs constantNode value" -> Error
+  | MJ.ExnUnknown => RerrTodo("Unhandled MathJs constantNode value") -> Error
   }
 | "FunctionNode" => {
     let fNode = node -> MJ.castFunctionNode
@@ -52,7 +54,7 @@ let rec fromNode = (node: MJ.node): result<codeTree, 'e> => switch node["type"] 
   pNode["content"] -> fromNode
 }
 
-| aNodeType => Error("TODO MathJs Node Type: " ++ aNodeType)
+| aNodeType => RerrTodo("TODO MathJs Node Type: " ++ aNodeType)->Error
 }
 and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
   Belt.List.reduce(nodeList, Ok(list{}), (racc, currNode) =>
@@ -85,7 +87,7 @@ let showResult = (codeResult) => switch codeResult {
 /*
   Converts a MathJs code to Lisp Code
 */
-let parse = (mathJsCode: string): result<codeTree, 'e> =>
+let parse = (mathJsCode: string): result<codeTree, Rerr.reducerError> =>
   mathJsCode -> MJ.parse -> Result.flatMap(node => fromNode(node))
 
 
@@ -104,7 +106,7 @@ let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e>
       })
 
   if Js.List.isEmpty( lisp ) {
-    Error("Function expected; got nothing")
+    Rerr.RerrTodo("Got nothing")->Error
   } else {
     switch List.hd( lisp ) {
     | CtSymbol(fname) => {
@@ -112,7 +114,7 @@ let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e>
         // Ok(CtValue(CTV.CtvString("result_of_fname")))
         Result.map( BuiltIn.dispatch(aCall), aValue => CtValue(aValue))
       }
-    | _ => Error("TODO User space functions not yet allowed")
+    | _ => Rerr.RerrTodo("User space functions not yet allowed")->Error
     }
   }
 
@@ -139,7 +141,7 @@ let evalWBindingsCodeTree = (aCodeTree, bindings): result<codeTreeValue, 'e> =>
   Result.flatMap( execCodeTree(aCodeTree, bindings),
   aCode => switch aCode {
     | CtValue( aValue ) => aValue -> Ok
-    | other => ("Unexecuted code remaining: "++ show(other)) -> Error
+    | other => RerrUnexecutedCode(show(other)) -> Error
   }
 )
 

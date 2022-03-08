@@ -1,6 +1,8 @@
 /*
   MathJs Nodes
 */
+module Rerr = Reducer_Error
+
 type node = {
   "type": string,
   "isNode": bool,
@@ -72,15 +74,12 @@ external castParanthesisNode: node => paranthesisNode = "%identity"
 */
 @module("mathjs") external parse__: string => node = "parse"
 
-let parse = (expr: string) =>
+let parse = (expr: string): result<node, Rerr.reducerError> =>
   try {
     Ok(parse__(expr))
   } catch {
   | Js.Exn.Error(obj) =>
-    switch Js.Exn.message(obj) {
-    | Some(m) => Error("MathJs Parser "++m)
-    | None => Error("MatjJs Parser")
-    }
+    RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error
   }
 
 module Examples = {
@@ -89,44 +88,44 @@ module Examples = {
 
     Js.log("case 1+2")
     switch parse("1+2") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
+    | Ok(node) => node["type"]->Js.log
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     Js.log("case 1")
     switch parse("1") {
     | Ok(node) => {
-        Js.log(node["type"])
-        Js.log(node -> castConstantNode -> constantNodeValue)
+        node["type"]->Js.log
+        node -> castConstantNode -> constantNodeValue -> Js.log
       }
-    | Error(m) => Js.log("Error: "++m)
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     Js.log("case 'hello'")
     switch parse("'hello'") {
     | Ok(node) => {
-        Js.log(node["type"])
+        node["type"]->Js.log
         Js.log(node -> castConstantNode -> constantNodeValue)
       }
-    | Error(m) => Js.log("Error: "++m)
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     Js.log("case (1+2)")
     switch parse("(1+2)") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
+    | Ok(node) => node["type"]->Js.log
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     Js.log("case (1)")
     switch parse("(1)") {
     | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     Js.log("case fn(1)")
     switch parse("fn(1)") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
+    | Ok(node) => node["type"]->Js.log
+    | Error(m) => Rerr.showError(m)->Js.log
     }
 
     ()
