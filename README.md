@@ -32,24 +32,24 @@ yarn test
 Reducer.eval("<code>")
 ```
 
-Evaluating code returns a value with type
+Evaluating code returns a value of type:
 ```res
-ReducerExternal.CodeTreeValue.CodeTreeValue
+ReducerExternal.CodeTreeValue.codeTreeValue
 ```
 
-External functions to the reducer are introduced in
+External functions to the reducer are introduced in:
 
 ```res
 ReducerExternal.ReducerLibrary
 ```
 
 The types in code tree value are what we need to call the external functions.
-ReducerLibrary and CodeTreeValue are configurations of Reducer.
-Reducer itself does not and does not depend on external libraries.
+  ReducerLibrary and CodeTreeValue are configurations of Reducer.
+  Reducer itself does not depend on external libraries.
 
 ## Notes
 
-LISP is the most basic functional language. It has no syntax sugar. It's evaluated by using map-reduce. However it's a complete language. Any syntax sugar in any language can be expressed in LISP. Actually, LISP is just a code tree. There is nothing else. Code Tree here is map-reduced similar to LISP but it is aggressive to resolve the external calls as soon as possible. Lazy evaluation will be enabled depending on context
+LISP is the most basic functional language. In fact, LISP can be the assembly code of all functional languages. It has no syntax sugar. It's evaluated by using map-reduce. However it's a complete language. Any syntax sugar in any language can be expressed in LISP. Actually, LISP is just a code tree. There is nothing else. Code Tree here is map-reduced similar to LISP but it is aggressive to resolve the external calls as soon as possible. Lazy evaluation will be enabled depending on context
 
 Here I map MathJs parser to code tree. Thus MathJs scripts will become a complete functional language. The code tree map-reduce is in place. However, not all MathJs nodes are mapped yet. To do List:
 
