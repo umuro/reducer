@@ -9,21 +9,6 @@ let eval = (codeText:string):result<CodeTree.codeTreeValue, 'e> => codeText -> C
 
 
 module Examples = {
-  let examplesShow = ():unit => {
-    Js.log("Reducer.CodeTree parse examples")
-
-    Js.log("case 1")
-    parse("1") ->  CodeTree.showResult -> Js.log
-    Js.log("case (1)")
-    parse("(1)") -> CodeTree.showResult -> Js.log
-    Js.log("case 1+2")
-    parse("1+2") -> CodeTree.showResult -> Js.log
-    Js.log("case add(1,2)")
-    parse("add(1,2)") -> CodeTree.showResult -> Js.log
-    Js.log("case 1+2*3")
-    parse("1+2*3") -> CodeTree.showResult -> Js.log
-    ()
-  }
 
   let examplesEval = ():unit =>  {
     Js.log("Reducer.CodeTree.eval examples")
@@ -36,7 +21,6 @@ module Examples = {
     ()
   }
   let examples = ():unit => {
-    examplesShow()
     examplesEval()
     ()
   }
