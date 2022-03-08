@@ -8,12 +8,9 @@ module Result = Belt.Result
 type codeTreeValue = CTV.codeTreeValue
 
 type rec codeTree =
-| CtList(listOfCodeTree)  // A list to map-reduce
+| CtList(list<codeTree>)  // A list to map-reduce
 | CtValue(codeTreeValue)      // Irreducable built-in value. Reducer should not know the internals
 | CtSymbol(string)        // A symbol. Defined in local bindings
-and listOfCodeTree = list<codeTree>
-type resultOfCodeTree<'e> = result<codeTree, 'e>
-type resultOfListOfCodeTree<'e> = result<listOfCodeTree, 'e>
 
 module MJ = Reducer_MathJsParse
 
@@ -29,7 +26,7 @@ module MJ = Reducer_MathJsParse
 // RangeNode
 // RelationalNode
 // SymbolNode
-let rec fromNode = (node: MJ.node): resultOfCodeTree<'e> => switch node["type"] {
+let rec fromNode = (node: MJ.node): result<codeTree, 'e> => switch node["type"] {
 | "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
   | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
   | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
@@ -57,7 +54,7 @@ let rec fromNode = (node: MJ.node): resultOfCodeTree<'e> => switch node["type"] 
 
 | aNodeType => Error("TODO MathJs Node Type: " ++ aNodeType)
 }
-and let fromNodeList = (nodeList: list<MJ.node>): resultOfListOfCodeTree <'e> =>
+and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
   Belt.List.reduce(nodeList, Ok(list{}), (racc, currNode) =>
     racc
       -> Result.flatMap( acc =>
@@ -88,7 +85,7 @@ let showResult = (codeResult) => switch codeResult {
 /*
   Converts a MathJs code to Lisp Code
 */
-let parse = (mathJsCode: string): resultOfCodeTree<'e> =>
+let parse = (mathJsCode: string): result<codeTree, 'e> =>
   mathJsCode -> MJ.parse -> Result.flatMap(node => fromNode(node))
 
 
@@ -97,7 +94,7 @@ type bindings = MapString.t<unit>
 let defaultBindings: bindings = MapString.fromArray([])
 // TODO Define bindings for function execution context
 
-let execFunctionCall = ( lisp: listOfCodeTree, _bindings ): result<codeTree, 'e> => {
+let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
 
   let stripArgs = (args): list<CTV.codeTreeValue> =>
     Belt.List.map(args, a =>
@@ -125,7 +122,7 @@ let rec execCodeTree = (aCodeTree, bindings): result<codeTree, 'e> => switch aCo
   | CtList( aList ) => execLispList( aList, bindings )
   | x => x -> Ok
 }
-and let execLispList = ( list: listOfCodeTree, bindings ) => {
+and let execLispList = ( list: list<codeTree>, bindings ) => {
   Belt.List.reduce(list, Ok(list{}), (racc, currCode) =>
   racc
     -> Result.flatMap( acc =>

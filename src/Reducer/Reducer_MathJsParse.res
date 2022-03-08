@@ -6,9 +6,6 @@ type node = {
   "isNode": bool,
   "comment": string
 }
-type resultOfNode<'e> = result<node, 'e>
-type listOfNode = list<node>
-type resultOflistOfNode<'e> = result<listOfNode, 'e>
 //accessorNode
 //arrayNode
 //assignmentNode
