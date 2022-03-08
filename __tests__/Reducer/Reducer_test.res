@@ -1,4 +1,5 @@
 module CT = Reducer.CodeTree
+module CTV = ReducerExternal.CodeTreeValue
 // CT.showResult converts a tree to string
 
 open Jest
@@ -24,8 +25,12 @@ describe("parse", () => {
 
 describe("eval", () => {
 
-  test("toBe", () =>
-    expect(1 + 2) -> toBe(3))
+  test("1", () =>
+    expect( Reducer.eval("1") -> CTV.showResult ) -> toBe("Ok(1)"))
+  test("1+2", () =>
+    expect( Reducer.eval("1+2") -> CTV.showResult ) -> toBe("Ok(3)"))
+  test("1+(2+3)", () =>
+    expect( Reducer.eval("1+(2+3)") -> CTV.showResult ) -> toBe("Ok(6)"))
 })
 
 // TODO Error classes
