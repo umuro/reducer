@@ -1,2 +1,1 @@
-// Reducer.MathJsParse.Examples.examples()
-Reducer.Examples.examples()
+Js.log("See unit tests")
