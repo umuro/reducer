@@ -3,6 +3,7 @@
   This is a configuration to to make external calls of those types
 */
 module Rerr = Reducer_Error
+module BA = Belt.Array
 
 type codeTreeValue =
 | CtvBool(bool)
@@ -18,6 +19,8 @@ let show = aValue => switch aValue {
   | CtvString( aString ) => "\"" ++ aString++ "\""
   | CtvUndefined => "Undefined"
 }
+
+let showArgs = args => BA.reduce(args, "", (acc, arg) => acc ++ " " ++ show(arg))
 
 let showResult = (x) => switch x {
   | Ok(a) => "Ok("++ show(a)++")"
