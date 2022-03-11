@@ -25,5 +25,5 @@ let dispatch = (call: CTV.functionCall): result<CTV.codeTreeValue, Rerr.reducerE
   } catch {
   | Js.Exn.Error(obj) =>
     RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error
-  | err => RerrTodo("unhandled rescript exception")->Error
+  | _ => RerrTodo("unhandled rescript exception")->Error
   }
