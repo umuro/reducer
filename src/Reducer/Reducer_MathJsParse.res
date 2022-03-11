@@ -24,7 +24,7 @@ external castNumber: unit => float = "%identity"
 external castString: unit => string = "%identity"
 external castBool: unit => bool = "%identity"
 
-type exnConstant = ExnNumber(float) | ExnString(string) | ExnBool(bool) | ExnUnknown
+type exnConstant = ExnNumber(float) | ExnString(string) | ExnBool(bool) | ExnUnknown(string)
 
 /*
   As JavaScript returns us any type, we need to type check and cast type propertype before using it
@@ -35,7 +35,7 @@ let constantNodeValue = (cnode: constantNode): exnConstant => {
   | "number" => cnode["value"] -> castNumber -> ExnNumber
   | "string" => cnode["value"] -> castString -> ExnString
   | "boolean" => cnode["value"] -> castBool -> ExnBool
-  | _ => ExnUnknown
+  | other => ExnUnknown(other)
   }
 }
 

@@ -28,34 +28,29 @@ module MJ = Reducer_MathJsParse
 // RelationalNode
 // SymbolNode
 let rec fromNode =
-  (node: MJ.node): result<codeTree, Rerr.reducerError> => switch node["type"] {
-| "ConstantNode" => switch node -> MJ.castConstantNode -> MJ.constantNodeValue {
-  | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
-  | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
-  | MJ.ExnBool(x) => x -> CTV.CtvBool -> CtValue -> Ok
-  | MJ.ExnUnknown => RerrTodo("Unhandled MathJs constantNode value") -> Error
-  }
-| "FunctionNode" => {
-    let fNode = node -> MJ.castFunctionNode
-    let lispName = fNode["fn"] -> CtSymbol
-    let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-    lispArgs
-    -> Result.map( aList => list{lispName, ...aList} -> CtList )
-  }
-| "OperatorNode" => {
-  let fNode = node -> MJ.castOperatorNode
-  let lispName = fNode["fn"] -> CtSymbol
-  let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-  lispArgs
-  -> Result.map( aList => list{lispName, ...aList} -> CtList )
-}
-| "ParenthesisNode" => {
-  let pNode = node -> MJ.castParanthesisNode
-  pNode["content"] -> fromNode
-}
-
-| aNodeType => RerrTodo("TODO MathJs Node Type: " ++ aNodeType)->Error
-}
+  (mjnode: MJ.node): result<codeTree, Rerr.reducerError> =>
+    switch MJ.castNodeType(mjnode) {
+      | Ok(MjConstantNode(cNode)) => switch MJ.constantNodeValue(cNode) {
+        | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
+        | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
+        | MJ.ExnBool(x) => x -> CTV.CtvBool -> CtValue -> Ok
+        | MJ.ExnUnknown(x) => RerrTodo("Unhandled MathJs constantNode type: "++x) -> Error
+        }
+      | Ok(MjFunctionNode(fNode)) => {
+        let lispName = fNode["fn"] -> CtSymbol
+        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
+        lispArgs
+        -> Result.map( aList => list{lispName, ...aList} -> CtList )
+        }
+      | Ok(MjOperatorNode(fNode)) => {
+        let lispName = fNode["fn"] -> CtSymbol
+        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
+        lispArgs
+        -> Result.map( aList => list{lispName, ...aList} -> CtList )
+        }
+      | Ok(MjParanthesisNode(pNode)) => pNode["content"] -> fromNode
+      | Error(x) => Error(x)
+    }
 and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
   Belt.List.reduce(nodeList, Ok(list{}), (racc, currNode) =>
     racc
@@ -89,7 +84,6 @@ let showResult = (codeResult) => switch codeResult {
 */
 let parse = (mathJsCode: string): result<codeTree, Rerr.reducerError> =>
   mathJsCode -> MJ.parse -> Result.flatMap(node => fromNode(node))
-
 
 module MapString = Belt.Map.String
 type bindings = MapString.t<unit>
