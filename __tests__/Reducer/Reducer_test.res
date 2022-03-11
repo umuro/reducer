@@ -39,6 +39,10 @@ describe("test exceptions", () => {
   test("javascript exception", () =>
     expect( Reducer.eval("jsraise('div by 0')") -> CTV.showResult ) -> toBe("Error(JS Exception: Error: \"div by 0\")")
   )
+
+  test("rescript exception", () =>
+    expect( Reducer.eval("resraise()") -> CTV.showResult ) -> toBe("Error(TODO: unhandled rescript exception)")
+  )
 })
 
 // TODO Error classes
