@@ -59,12 +59,12 @@ type operatorNode = {
 }
 external castOperatorNode: node => operatorNode = "%identity"
 
-//paranthesisNode
-type paranthesisNode = {
+//parenthesisNode
+type parenthesisNode = {
   ...node,
   "content": node
 }
-external castParanthesisNode: node => paranthesisNode = "%identity"
+external castParenthesisNode: node => parenthesisNode = "%identity"
 
 //rangeNode
 //relationalNode
@@ -87,14 +87,14 @@ type mjNode =
   | MjConstantNode(constantNode)
   | MjFunctionNode(functionNode)
   | MjOperatorNode(operatorNode)
-  | MjParanthesisNode(paranthesisNode)
+  | MjParenthesisNode(parenthesisNode)
 
 let castNodeType = (node) => switch node["type"] {
   | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
   | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
-  | "ParanthesisNode" => node -> castParanthesisNode -> MjParanthesisNode -> Ok
-  | _ => Rerr.RerrTodo("Unhandled MathJsNode: " ++ node["type"])-> Error
+  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
+  | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
 }
 
 module Examples = {

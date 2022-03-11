@@ -16,6 +16,8 @@ describe("parse", () => {
       expect( Reducer.parse("(1)")->CT.showResult ) -> toBe("Ok(1)"))
   test("1+2", () =>
       expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
+  test("(1+2)", () =>
+          expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
   test("add(1,2)", () =>
       expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
   test("1+2*3", () =>

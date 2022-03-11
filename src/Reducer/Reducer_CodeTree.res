@@ -48,7 +48,7 @@ let rec fromNode =
         lispArgs
         -> Result.map( aList => list{lispName, ...aList} -> CtList )
         }
-      | Ok(MjParanthesisNode(pNode)) => pNode["content"] -> fromNode
+      | Ok(MjParenthesisNode(pNode)) => pNode["content"] -> fromNode
       | Error(x) => Error(x)
     }
 and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
