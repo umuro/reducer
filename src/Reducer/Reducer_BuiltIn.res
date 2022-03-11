@@ -4,15 +4,22 @@ module Rerr = Reducer_Error
 /*
   MathJs provides default implementations for external calls
 */
-let callMatjJs = (_functionCall): result<'b, Rerr.reducerError> =>
-  RerrTodo("Calling MathJs")->Error // TODO call MathJs by default
+let callMatjJs = (call: CTV.functionCall): result<'b, Rerr.reducerError> =>
+  switch call {
+    // | (fn, _) => RerrTodo(String.equal(fn, "jsraise") ? "yes" : "no_"++fn++"_")->Error
+    | ("jsraise", [msg]) => Js.Exn.raiseError(CTV.show(msg))
+    | (fn, args) => RerrTodo("Function not found: '"++fn++"' with args "++CTV.showArgs(args)) -> Error
+  }
 
 /*
   Lisp engine uses Result monad while reducing expressions
 */
 let dispatch = (call: CTV.functionCall): result<CTV.codeTreeValue, Rerr.reducerError> =>
   try {
-    Lib.dispatch(call, callMatjJs)
+    let (fn, args) = call
+    // There is a bug that prevents string match in patterns
+    // So we have to recreate a copy of the string
+    Lib.dispatch((Js.String.make(fn), args), callMatjJs)
   } catch {
   | Js.Exn.Error(obj) =>
     RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error

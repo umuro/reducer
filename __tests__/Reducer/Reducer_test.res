@@ -35,6 +35,12 @@ describe("eval", () => {
     expect( Reducer.eval("1+(2+3)") -> CTV.showResult ) -> toBe("Ok(6)"))
 })
 
+describe("test exceptions", () => {
+  test("javascript exception", () =>
+    expect( Reducer.eval("jsraise('div by 0')") -> CTV.showResult ) -> toBe("Error(JS Exception: Error: \"div by 0\")")
+  )
+})
+
 // TODO Error classes
 // TODO test div by 0
 // TODO test syntax error
