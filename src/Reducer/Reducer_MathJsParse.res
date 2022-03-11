@@ -18,6 +18,7 @@ type constantNode = {
   ...node,
   "value": unit
 }
+
 external castConstantNode: node => constantNode = "%identity"
 external castNumber: unit => float = "%identity"
 external castString: unit => string = "%identity"
@@ -82,15 +83,23 @@ let parse = (expr: string): result<node, Rerr.reducerError> =>
     RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error
   }
 
+type mjNode =
+  | MjConstantNode(constantNode)
+  | MjFunctionNode(functionNode)
+  | MjOperatorNode(operatorNode)
+  | MjParanthesisNode(paranthesisNode)
+
+let castNodeType = (node) => switch node["type"] {
+  | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
+  | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
+  | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
+  | "ParanthesisNode" => node -> castParanthesisNode -> MjParanthesisNode -> Ok
+  | _ => Rerr.RerrTodo("Unhandled MathJsNode: " ++ node["type"])-> Error
+}
+
 module Examples = {
   let examples = ():unit => {
     Js.log("MathJs.parse Examples:")
-
-    Js.log("case 1+2")
-    switch parse("1+2") {
-    | Ok(node) => node["type"]->Js.log
-    | Error(m) => Rerr.showError(m)->Js.log
-    }
 
     Js.log("case 1")
     switch parse("1") {
@@ -98,6 +107,12 @@ module Examples = {
         node["type"]->Js.log
         node -> castConstantNode -> constantNodeValue -> Js.log
       }
+    | Error(m) => Rerr.showError(m)->Js.log
+    }
+
+    Js.log("case 1+2")
+    switch parse("1+2") {
+    | Ok(node) => node["type"]->Js.log
     | Error(m) => Rerr.showError(m)->Js.log
     }
 
