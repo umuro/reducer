@@ -6,9 +6,8 @@ module Rerr = Reducer_Error
 */
 let callMatjJs = (call: CTV.functionCall): result<'b, Rerr.reducerError> =>
   switch call {
-    // | (fn, _) => RerrTodo(String.equal(fn, "jsraise") ? "yes" : "no_"++fn++"_")->Error
     | ("jsraise", [msg]) => Js.Exn.raiseError(CTV.show(msg))
-    | (fn, args) => RerrTodo("Function not found: '"++fn++"' with args "++CTV.showArgs(args)) -> Error
+    | (fn, args) => RerrFunctionNotFound(fn, CTV.showArgs(args)) -> Error
   }
 
 /*
