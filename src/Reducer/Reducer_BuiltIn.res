@@ -1,21 +1,19 @@
 module CTV = ReducerExternal.CodeTreeValue
 module Lib = ReducerExternal.ReducerLibrary
+module Rerr = Reducer_Error
 /*
   MathJs provides default implementations for external calls
 */
-let callMatjJs = (_functionCall) =>
-  Error("TODO call MathJs") // TODO call MathJs by default
+let callMatjJs = (_functionCall): result<'b, Rerr.reducerError> =>
+  RerrTodo("Calling MathJs")->Error // TODO call MathJs by default
 
 /*
   Lisp engine uses Result monad while reducing expressions
 */
-let dispatch = (call: CTV.functionCall): result<CTV.codeTreeValue, 'e> =>
+let dispatch = (call: CTV.functionCall): result<CTV.codeTreeValue, Rerr.reducerError> =>
   try {
     Lib.dispatch(call, callMatjJs)
   } catch {
   | Js.Exn.Error(obj) =>
-    switch Js.Exn.message(obj) {
-    | Some(m) => Error("RunTime Error "++m) //e.g. division by zero
-    | None => Error("RunTime Error ")
-    }
+    RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error
   }

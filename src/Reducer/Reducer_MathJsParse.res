@@ -1,14 +1,13 @@
 /*
   MathJs Nodes
 */
+module Rerr = Reducer_Error
+
 type node = {
   "type": string,
   "isNode": bool,
   "comment": string
 }
-type resultOfNode<'e> = result<node, 'e>
-type listOfNode = list<node>
-type resultOflistOfNode<'e> = result<listOfNode, 'e>
 //accessorNode
 //arrayNode
 //assignmentNode
@@ -19,12 +18,13 @@ type constantNode = {
   ...node,
   "value": unit
 }
+
 external castConstantNode: node => constantNode = "%identity"
 external castNumber: unit => float = "%identity"
 external castString: unit => string = "%identity"
 external castBool: unit => bool = "%identity"
 
-type exnConstant = ExnNumber(float) | ExnString(string) | ExnBool(bool) | ExnUnknown
+type exnConstant = ExnNumber(float) | ExnString(string) | ExnBool(bool) | ExnUnknown(string)
 
 /*
   As JavaScript returns us any type, we need to type check and cast type propertype before using it
@@ -35,7 +35,7 @@ let constantNodeValue = (cnode: constantNode): exnConstant => {
   | "number" => cnode["value"] -> castNumber -> ExnNumber
   | "string" => cnode["value"] -> castString -> ExnString
   | "boolean" => cnode["value"] -> castBool -> ExnBool
-  | _ => ExnUnknown
+  | other => ExnUnknown(other)
   }
 }
 
@@ -59,12 +59,12 @@ type operatorNode = {
 }
 external castOperatorNode: node => operatorNode = "%identity"
 
-//paranthesisNode
-type paranthesisNode = {
+//parenthesisNode
+type parenthesisNode = {
   ...node,
   "content": node
 }
-external castParanthesisNode: node => paranthesisNode = "%identity"
+external castParenthesisNode: node => parenthesisNode = "%identity"
 
 //rangeNode
 //relationalNode
@@ -75,63 +75,24 @@ external castParanthesisNode: node => paranthesisNode = "%identity"
 */
 @module("mathjs") external parse__: string => node = "parse"
 
-let parse = (expr: string) =>
+let parse = (expr: string): result<node, Rerr.reducerError> =>
   try {
     Ok(parse__(expr))
   } catch {
   | Js.Exn.Error(obj) =>
-    switch Js.Exn.message(obj) {
-    | Some(m) => Error("MathJs Parser "++m)
-    | None => Error("MatjJs Parser")
-    }
+    RerrJs(Js.Exn.message(obj), Js.Exn.name(obj))->Error
   }
 
-module Examples = {
-  let examples = ():unit => {
-    Js.log("MathJs.parse Examples:")
+type mjNode =
+  | MjConstantNode(constantNode)
+  | MjFunctionNode(functionNode)
+  | MjOperatorNode(operatorNode)
+  | MjParenthesisNode(parenthesisNode)
 
-    Js.log("case 1+2")
-    switch parse("1+2") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    Js.log("case 1")
-    switch parse("1") {
-    | Ok(node) => {
-        Js.log(node["type"])
-        Js.log(node -> castConstantNode -> constantNodeValue)
-      }
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    Js.log("case 'hello'")
-    switch parse("'hello'") {
-    | Ok(node) => {
-        Js.log(node["type"])
-        Js.log(node -> castConstantNode -> constantNodeValue)
-      }
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    Js.log("case (1+2)")
-    switch parse("(1+2)") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    Js.log("case (1)")
-    switch parse("(1)") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    Js.log("case fn(1)")
-    switch parse("fn(1)") {
-    | Ok(node) => Js.log(node["type"])
-    | Error(m) => Js.log("Error: "++m)
-    }
-
-    ()
-  }
+let castNodeType = (node) => switch node["type"] {
+  | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
+  | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
+  | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
+  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
+  | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
 }
