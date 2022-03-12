@@ -44,6 +44,3 @@ describe("test exceptions", () => {
   )
 
 })
-
-// TODO language basics
-// TODO eval + - / * > >= < <= == /= not and or
