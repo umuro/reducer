@@ -1,6 +1,5 @@
 module CT = Reducer.CodeTree
 module CTV = ReducerExternal.CodeTreeValue
-// CT.showResult converts a tree to string
 
 open Jest
 open Expect
@@ -43,11 +42,8 @@ describe("test exceptions", () => {
   test("rescript exception", () =>
     expect( Reducer.eval("resraise()") -> CTV.showResult ) -> toBe("Error(TODO: unhandled rescript exception)")
   )
-})
 
-// TODO Error classes
-// TODO test div by 0
-// TODO test syntax error
+})
 
 // TODO language basics
 // TODO eval + - / * > >= < <= == /= not and or
