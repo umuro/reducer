@@ -3,5 +3,6 @@
 */
 let rec interperse = (aList, seperator) => switch aList {
   | list{} => list{}
+  | list{a} => list{a}
   | list{a, ...rest} => list{a, seperator, ...interperse(rest, seperator)}
 }

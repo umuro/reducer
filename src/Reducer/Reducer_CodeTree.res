@@ -1,7 +1,7 @@
-module CTV = ReducerExternal.CodeTreeValue
-module BuiltIn = Reducer_BuiltIn
+module BuiltIn = Reducer_Dispatch_BuiltIn
+module CTV = Reducer_Extension.CodeTreeValue
+module JsG = Reducer_Js_Gate
 module RLE = Reducer_ListExt
-module Dbg = Reducer_Debug
 module Rerr = Reducer_Error
 
 module Result = Belt.Result
@@ -13,7 +13,7 @@ type rec codeTree =
 | CtValue(codeTreeValue)      // Irreducable built-in value. Reducer should not know the internals
 | CtSymbol(string)        // A symbol. Defined in local bindings
 
-module MJ = Reducer_MathJsParse
+module MJ = Reducer_MathJs_Parse
 
 // TODO:
 // AccessorNode
@@ -30,12 +30,8 @@ module MJ = Reducer_MathJsParse
 let rec fromNode =
   (mjnode: MJ.node): result<codeTree, Rerr.reducerError> =>
     switch MJ.castNodeType(mjnode) {
-      | Ok(MjConstantNode(cNode)) => switch MJ.constantNodeValue(cNode) {
-        | MJ.ExnNumber(x) => x -> CTV.CtvNumber -> CtValue -> Ok
-        | MJ.ExnString(x) => x -> CTV.CtvString -> CtValue -> Ok
-        | MJ.ExnBool(x) => x -> CTV.CtvBool -> CtValue -> Ok
-        | MJ.ExnUnknown(x) => RerrTodo("Unhandled MathJs constantNode type: "++x) -> Error
-        }
+      | Ok(MjConstantNode(cNode)) =>
+        cNode["value"]-> JsG.jsToCtv -> Result.map( v => v->CtValue)
       | Ok(MjFunctionNode(fNode)) => {
         let lispName = fNode["fn"] -> CtSymbol
         let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList

@@ -1,6 +1,7 @@
 /*
   MathJs Nodes
 */
+module JsG = Reducer_Js_Gate
 module Rerr = Reducer_Error
 
 type node = {
@@ -18,26 +19,7 @@ type constantNode = {
   ...node,
   "value": unit
 }
-
 external castConstantNode: node => constantNode = "%identity"
-external castNumber: unit => float = "%identity"
-external castString: unit => string = "%identity"
-external castBool: unit => bool = "%identity"
-
-type exnConstant = ExnNumber(float) | ExnString(string) | ExnBool(bool) | ExnUnknown(string)
-
-/*
-  As JavaScript returns us any type, we need to type check and cast type propertype before using it
-*/
-let constantNodeValue = (cnode: constantNode): exnConstant => {
-  let typeString = %raw(`typeof cnode.value`)
-  switch typeString {
-  | "number" => cnode["value"] -> castNumber -> ExnNumber
-  | "string" => cnode["value"] -> castString -> ExnString
-  | "boolean" => cnode["value"] -> castBool -> ExnBool
-  | other => ExnUnknown(other)
-  }
-}
 
 //functionAssignmentNode
 //functionNode

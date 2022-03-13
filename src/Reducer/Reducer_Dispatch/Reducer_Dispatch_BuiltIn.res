@@ -1,5 +1,6 @@
-module CTV = ReducerExternal.CodeTreeValue
-module Lib = ReducerExternal.ReducerLibrary
+module CTV = Reducer_Extension.CodeTreeValue
+module Lib = Reducer_Extension.ReducerLibrary
+module ME = Reducer_MathJs.Eval
 module Rerr = Reducer_Error
 /*
   MathJs provides default implementations for external calls
@@ -8,9 +9,9 @@ exception TestRescriptException
 
 let callMatjJs = (call: CTV.functionCall): result<'b, Rerr.reducerError> =>
   switch call {
-    | ("jsraise", [msg]) => Js.Exn.raiseError(CTV.show(msg))
-    | ("resraise", _) => raise(TestRescriptException)
-    | (fn, args) => RerrFunctionNotFound(fn, CTV.showArgs(args)) -> Error
+    | ("jsraise", [msg]) => Js.Exn.raiseError(CTV.show(msg)) // For Tests
+    | ("resraise", _) => raise(TestRescriptException) // For Tests
+    | call => call->CTV.showFunctionCall-> ME.eval
   }
 
 /*

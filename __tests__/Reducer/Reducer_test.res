@@ -1,6 +1,5 @@
 module CT = Reducer.CodeTree
-module CTV = ReducerExternal.CodeTreeValue
-// CT.showResult converts a tree to string
+module CTV = Reducer.Extension.CodeTreeValue
 
 open Jest
 open Expect
@@ -15,13 +14,13 @@ describe("parse", () => {
   test("(1)", () =>
       expect( Reducer.parse("(1)")->CT.showResult ) -> toBe("Ok(1)"))
   test("1+2", () =>
-      expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
+      expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2))"))
   test("(1+2)", () =>
-          expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
+          expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2))"))
   test("add(1,2)", () =>
-      expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2 ))"))
+      expect( Reducer.parse("1+2")->CT.showResult ) -> toBe("Ok((:add 1 2))"))
   test("1+2*3", () =>
-      expect( Reducer.parse("1+2*3")->CT.showResult ) -> toBe("Ok((:add 1 (:multiply 2 3 ) ))"))
+      expect( Reducer.parse("1+2*3")->CT.showResult ) -> toBe("Ok((:add 1 (:multiply 2 3)))"))
   // TODO test not yet implemented semantic mapping
 })
 
@@ -37,17 +36,11 @@ describe("eval", () => {
 
 describe("test exceptions", () => {
   test("javascript exception", () =>
-    expect( Reducer.eval("jsraise('div by 0')") -> CTV.showResult ) -> toBe("Error(JS Exception: Error: \"div by 0\")")
+    expect( Reducer.eval("jsraise('div by 0')") -> CTV.showResult ) -> toBe("Error(JS Exception: Error: 'div by 0')")
   )
 
   test("rescript exception", () =>
     expect( Reducer.eval("resraise()") -> CTV.showResult ) -> toBe("Error(TODO: unhandled rescript exception)")
   )
+
 })
-
-// TODO Error classes
-// TODO test div by 0
-// TODO test syntax error
-
-// TODO language basics
-// TODO eval + - / * > >= < <= == /= not and or

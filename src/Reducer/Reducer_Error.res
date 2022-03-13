@@ -1,9 +1,8 @@
 type reducerError =
-| RerrTodo(string) // To do
-| RerrJs(option<string>, option<string>)   // Javascript Exception
-| RerrUnexecutedCode( string )
 | RerrFunctionExpected( string )
-| RerrFunctionNotFound( string, string )
+| RerrJs(option<string>, option<string>)   // Javascript Exception
+| RerrTodo(string) // To do
+| RerrUnexecutedCode( string )
 
 let showError = (err) => switch err {
   | RerrTodo( msg ) => "TODO: " ++ msg
@@ -21,5 +20,4 @@ let showError = (err) => switch err {
   }
   | RerrUnexecutedCode( codeString ) => "Unexecuted code remaining: "++codeString
   | RerrFunctionExpected( msg ) => "Function expected: "++msg
-  | RerrFunctionNotFound( fn, argDesc ) => "Function Not Found: "++fn++" with args: "++argDesc
   }
