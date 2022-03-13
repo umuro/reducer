@@ -1,6 +1,6 @@
 module CTV = Reducer_Extension.CodeTreeValue
-module Rerr = Reducer_Error
 module JsG = Reducer_Js_Gate
+module Rerr = Reducer_Error
 
 @module("mathjs") external dummy_: string => unit = "evaluate"
 let dummy1_ = dummy_ //Deceive the compiler to make the import although we wont make a call from rescript. Otherwise the optimizer deletes the import

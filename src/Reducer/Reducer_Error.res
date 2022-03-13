@@ -1,8 +1,8 @@
 type reducerError =
-| RerrTodo(string) // To do
-| RerrJs(option<string>, option<string>)   // Javascript Exception
-| RerrUnexecutedCode( string )
 | RerrFunctionExpected( string )
+| RerrJs(option<string>, option<string>)   // Javascript Exception
+| RerrTodo(string) // To do
+| RerrUnexecutedCode( string )
 
 let showError = (err) => switch err {
   | RerrTodo( msg ) => "TODO: " ++ msg

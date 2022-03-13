@@ -2,10 +2,10 @@
   Irreducable values. Reducer does not know about those. Only used for external calls
   This is a configuration to to make external calls of those types
 */
-module Rerr = Reducer_Error
 module BA = Belt.Array
-module LE = Reducer_ListExt
 module BList = Belt.List
+module LE = Reducer_ListExt
+module Rerr = Reducer_Error
 
 type codeTreeValue =
 | CtvBool(bool)

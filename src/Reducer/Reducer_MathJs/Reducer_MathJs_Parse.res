@@ -1,8 +1,8 @@
 /*
   MathJs Nodes
 */
-module Rerr = Reducer_Error
 module JsG = Reducer_Js_Gate
+module Rerr = Reducer_Error
 
 type node = {
   "type": string,

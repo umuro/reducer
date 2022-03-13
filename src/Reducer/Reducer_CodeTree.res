@@ -1,8 +1,8 @@
-module CTV = Reducer_Extension.CodeTreeValue
 module BuiltIn = Reducer_Dispatch_BuiltIn
+module CTV = Reducer_Extension.CodeTreeValue
+module JsG = Reducer_Js_Gate
 module RLE = Reducer_ListExt
 module Rerr = Reducer_Error
-module JsG = Reducer_Js_Gate
 
 module Result = Belt.Result
 
