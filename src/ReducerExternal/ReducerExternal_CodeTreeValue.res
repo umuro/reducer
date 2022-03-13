@@ -30,8 +30,7 @@ let showArgs = (args: array<codeTreeValue>): string => {
   -> BList.toArray
   -> Js.String.concatMany("") }
 
-
-let showFunctionCall = (fn, args) =>
+let showFunctionCall = ((fn, args)): string =>
   fn ++ "("++showArgs(args)++")"
 
 let showResult = (x) => switch x {
