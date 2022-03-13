@@ -1,4 +1,4 @@
-module CTV = ReducerExternal.CodeTreeValue
+module CTV = Reducer_Extension.CodeTreeValue
 module Rerr = Reducer_Error
 
 external castNumber: unit => float = "%identity"

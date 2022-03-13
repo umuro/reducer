@@ -1,9 +1,8 @@
-module CTV = ReducerExternal.CodeTreeValue
-module BuiltIn = Reducer_BuiltIn
+module CTV = Reducer_Extension.CodeTreeValue
+module BuiltIn = Reducer_Dispatch_BuiltIn
 module RLE = Reducer_ListExt
-module Dbg = Reducer_Debug
 module Rerr = Reducer_Error
-module JsG = ReducerExternal_JsGate
+module JsG = Reducer_Js_Gate
 
 module Result = Belt.Result
 
@@ -14,7 +13,7 @@ type rec codeTree =
 | CtValue(codeTreeValue)      // Irreducable built-in value. Reducer should not know the internals
 | CtSymbol(string)        // A symbol. Defined in local bindings
 
-module MJ = Reducer_MathJsParse
+module MJ = Reducer_MathJs_Parse
 
 // TODO:
 // AccessorNode

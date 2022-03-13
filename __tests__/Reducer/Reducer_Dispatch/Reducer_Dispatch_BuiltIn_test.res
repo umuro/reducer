@@ -1,6 +1,6 @@
 module CT = Reducer.CodeTree
-module Ctv = ReducerExternal.CodeTreeValue
-module JsG = ReducerExternal_JsGate
+module Ctv = Reducer_Extension.CodeTreeValue
+module JsG = Reducer_Js_Gate
 
 open Jest
 open Expect

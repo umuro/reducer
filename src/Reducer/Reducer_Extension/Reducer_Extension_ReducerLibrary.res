@@ -1,4 +1,4 @@
-module CTV = ReducerExternal_CodeTreeValue
+module CTV = Reducer_Extension_CodeTreeValue
 
 module Sample = { // In real life real libraries should be somewhere else
   /*

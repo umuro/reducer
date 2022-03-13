@@ -1,5 +1,5 @@
 module Result = Belt.Result
-module MJ=Reducer.MathJsParse
+module MJ=Reducer.MathJs.Parse
 
 open Jest
 // open Expect

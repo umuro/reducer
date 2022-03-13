@@ -1,7 +1,7 @@
-module Ctv = ReducerExternal.CodeTreeValue
-module Lib = ReducerExternal.ReducerLibrary
+module Ctv = Reducer_Extension.CodeTreeValue
+module Lib = Reducer_Extension.ReducerLibrary
 module Rerr = Reducer_Error
-module ME = Reducer_MathJsEval
+module ME = Reducer_MathJs_Eval
 /*
   MathJs provides default implementations for external calls
 */

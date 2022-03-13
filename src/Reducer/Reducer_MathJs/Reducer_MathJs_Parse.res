@@ -2,7 +2,7 @@
   MathJs Nodes
 */
 module Rerr = Reducer_Error
-module JsG = ReducerExternal_JsGate
+module JsG = Reducer_Js_Gate
 
 type node = {
   "type": string,

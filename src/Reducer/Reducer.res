@@ -1,8 +1,10 @@
-module MathJsParse = Reducer_MathJsParse
 module CodeTree = Reducer_CodeTree
+module Error = Reducer_Error
 module ListExt = Reducer_ListExt
+module MathJs = Reducer_MathJs
+module Dispatch = Reducer_Dispatch
+module Extension = Reducer_Extension
+module Js = Reducer_Js
 
-module CTV = ReducerExternal_CodeTreeValue
-
-let parse = (codeText:string):result<CodeTree.codeTree, 'e> => codeText -> CodeTree.parse
-let eval = (codeText:string):result<CodeTree.codeTreeValue, 'e> => codeText -> CodeTree.eval
+let parse = CodeTree.parse
+let eval = CodeTree.eval

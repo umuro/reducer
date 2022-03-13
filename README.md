@@ -35,18 +35,25 @@ Reducer.eval("<code>")
 
 Evaluating code returns a value of type:
 ```res
-ReducerExternal.CodeTreeValue.codeTreeValue
+Reducer_Extension.CodeTreeValue.codeTreeValue
 ```
 
 External functions to the reducer are introduced in:
 
 ```res
-ReducerExternal.ReducerLibrary
+Reducer_Extension.ReducerLibrary
 ```
 
 The types in code tree value are what we need to call the external functions.
   ReducerLibrary and CodeTreeValue are configurations of Reducer.
   Reducer itself does not depend on external libraries.
+
+## Extending the Library of Functions
+The module Reducer.Extension contains the definitions to extend it with functions.
+- Reducer.Extension.CodeTreeValue is to define new data types necessary for the functions
+- Reducer.Extension.ReducerLibrary is to add new functions to the language
+All MathJs functions are available by default
+
 
 ## Notes
 
@@ -65,7 +72,7 @@ In addition to being fully functional. The current implementation is polymorphic
 
 Like LISP, all language features are provided by functions. If we need a language feature then it is a function. Bingo. No modification to the code tree is required.
 
-An example of polymorphic function mapping is in ReducerExternal_ReducerLibrary.res
+An example of polymorphic function mapping is in Reducer_Extension_ReducerLibrary.res
 
 An external function is called if and only if it's full type signature is matching. Thus polymorphic functions can be defined. Like
 
@@ -74,7 +81,7 @@ An external function is called if and only if it's full type signature is matchi
 
 The search priority of functions will be in this order
 1\. User space. Defined in the script
-2\. Built-in extension. Special domains to extend the Reducer. Look up for a mapping in ReducerExternal_ReducerLibrary.res
+2\. Built-in extension. Special domains to extend the Reducer. Look up for a mapping in Reducer_Extension_ReducerLibrary.res
 3\. Very Basic built-ins not provided by MathJs library. If they are very basic to computer languages in general.
 4\. MathJs built-in
 
@@ -82,7 +89,7 @@ The whole tree code map-reduce uses the Result monad. All run-time exceptions ar
 
 ## Examples
 
-module Reducer.Examples contains examples of parsing and evaluating. To execute run Demo.res
+See Reducer_test.res
 
 ## Inheritance and Function Signatures
 
@@ -110,10 +117,7 @@ To inherit or not? Are the switch statements all over the library? Then its time
 
 ## TODO
 
--   Unit Testing - Error classes
--   Calling MathJs library for default implementations
 -   Do the first integration at Least one function
-
 -   variable definition // bindings // execution context
 
 ==============

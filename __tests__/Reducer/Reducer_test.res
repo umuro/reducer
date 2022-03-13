@@ -1,5 +1,5 @@
 module CT = Reducer.CodeTree
-module CTV = ReducerExternal.CodeTreeValue
+module CTV = Reducer_Extension.CodeTreeValue
 
 open Jest
 open Expect

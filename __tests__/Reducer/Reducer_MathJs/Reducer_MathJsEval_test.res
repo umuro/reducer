@@ -1,5 +1,5 @@
-module MathJsEval = Reducer_MathJsEval
-module Ctv = ReducerExternal.CodeTreeValue
+module MathJsEval = Reducer_MathJs_Eval
+module Ctv = Reducer_Extension.CodeTreeValue
 module Rerr = Reducer_Error
 
 open Jest
