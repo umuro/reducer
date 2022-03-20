@@ -1,5 +1,7 @@
+/.bsb.lock
+/.merlin
+/coverage/*
+/lib/*
 /node_modules/*
 /yarn-error.log
-/.merlin
-/lib/*
-/coverage/*
+/ReducerToFork.ffs_gui
