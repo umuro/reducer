@@ -37,4 +37,88 @@ describe("MathJs parse", () => {
     | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "ParenthesisNode", "content": {"type": "OperatorNode"}} )
     | _ => assert false
   })
+
+  describe( "variables", () => {
+    Skip.test("define", () =>
+      switch MJ.parse("x = 1") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("use", () =>
+      switch MJ.parse("x") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
+  describe( "functions", () => {
+    Skip.test("define", () =>
+      switch MJ.parse("identity(x) = x") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("use", () =>
+      switch MJ.parse("identity(x)") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
+  describe( "arrays", () => {
+    Skip.test("empty", () =>
+      switch MJ.parse("[]") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("define", () =>
+      switch MJ.parse("[0,1,2]") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("define with strings", () =>
+      switch MJ.parse("['hello', 'world']") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("range", () =>
+      switch MJ.parse("range(0, 4)") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("use", () =>
+      switch MJ.parse("subset([1,2,3], index(1))") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
+  describe( "records", () => {
+    Skip.test("define", () =>
+      switch MJ.parse("{a: 1, b: 2}") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+    Skip.test("use", () =>
+      switch MJ.parse("r.prop") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
+  describe( "comments", () => {
+    Skip.test("define", () =>
+      switch MJ.parse("# This is a comment") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
+  describe( "if statement", () => {
+    Skip.test("define", () =>
+      switch MJ.parse("if (true) { 1 } else { 0 }") -> Result.flatMap(p => p -> MJ.castNodeType) {
+      | Ok(MJ.MjParenthesisNode(node)) => expect( node ) -> toMatchObject( {"type": "xxx"} )
+      | _ => assert false
+    })
+  })
+
 })
