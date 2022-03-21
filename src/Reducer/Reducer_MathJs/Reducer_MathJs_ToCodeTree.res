@@ -21,23 +21,16 @@ type reducerError = Rerr.reducerError
 // RangeNode
 // RelationalNode
 // SymbolNode
+
 let rec fromNode =
   (mjnode: MJ.node): result<codeTree, reducerError> =>
     switch MJ.castNodeType(mjnode) {
       | Ok(MjConstantNode(cNode)) =>
         cNode["value"]-> JsG.jsToCtv -> Result.map( v => v->CTT.CtValue)
-      | Ok(MjFunctionNode(fNode)) => {
-        let lispName = fNode["fn"] -> CTT.CtSymbol
-        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-        lispArgs
-        -> Result.map( aList => list{lispName, ...aList} -> CTT.CtList )
-        }
-      | Ok(MjOperatorNode(fNode)) => {
-        let lispName = fNode["fn"] -> CTT.CtSymbol
-        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-        lispArgs
-        -> Result.map( aList => list{lispName, ...aList} -> CTT.CtList )
-        }
+      | Ok(MjFunctionNode(fNode)) => fNode
+        -> caseFunctionNode
+      | Ok(MjOperatorNode(opNode)) => opNode
+        ->  MJ.castOperatorNodeToFunctionNode  -> caseFunctionNode
       | Ok(MjParenthesisNode(pNode)) => pNode["content"] -> fromNode
       | Error(x) => Error(x)
     }
@@ -50,3 +43,9 @@ and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
           )
       )
   ) -> Result.map(aList => Belt.List.reverse(aList))
+and let caseFunctionNode = (fNode) => {
+  let lispName = fNode["fn"] -> CTT.CtSymbol
+  let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
+  lispArgs
+  -> Result.map( aList => list{lispName, ...aList} -> CTT.CtList )
+}

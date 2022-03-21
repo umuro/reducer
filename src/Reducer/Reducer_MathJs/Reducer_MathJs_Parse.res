@@ -48,6 +48,7 @@ type operatorNode = {
   "op": string,
 }
 external castOperatorNode: node => operatorNode = "%identity"
+external castOperatorNodeToFunctionNode: operatorNode => functionNode = "%identity"
 
 //parenthesisNode
 type parenthesisNode = {
@@ -94,9 +95,13 @@ let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch r
   | Ok(MjArrayNode(aNode)) => "["++ aNode["items"]->showNodeArray ++"]"
   | Ok(MjConstantNode(cnode)) => Js.String.make(cnode["value"])
   | Ok(MjParenthesisNode(pnode)) => "("++ showResult(castNodeType(pnode["content"])) ++")"
-  | Ok(MjFunctionNode(fnode)) => fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
-  | Ok(MjOperatorNode(fnode)) => fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
+  | Ok(MjFunctionNode(fnode)) =>
+      fnode -> showFunctionNode
+  | Ok(MjOperatorNode(opNode)) =>
+      opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
 }
+and let showFunctionNode = (fnode: functionNode): string =>
+  fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
 and let showNodeArray = (nodeArray: array<node>): string =>
   nodeArray
   -> Belt.Array.map( a => showResult(castNodeType(a)) )
