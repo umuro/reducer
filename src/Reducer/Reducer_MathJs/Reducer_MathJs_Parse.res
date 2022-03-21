@@ -87,27 +87,27 @@ let castNodeType = (node: node) => switch node["type"] {
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
   | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
   | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
-  | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
+  | _ => Rerr.RerrTodo(`Argg, unhandled MathJsNode: ${node["type"]}`)-> Error
 }
 
 let showValue = (a: 'a): string => if (Js.typeof(a) == "string") {
-  "'"++Js.String.make(a)++"'"
+  `'${Js.String.make(a)}'`
 } else {
   Js.String.make(a)
 }
 
 let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch rmjnode {
   | Error(e) => Rerr.showError(e)
-  | Ok(MjArrayNode(aNode)) => "["++ aNode["items"]->showNodeArray ++"]"
+  | Ok(MjArrayNode(aNode)) => `[${aNode["items"]->showNodeArray}]`
   | Ok(MjConstantNode(cNode)) => cNode["value"]->showValue
-  | Ok(MjParenthesisNode(pNode)) => "("++ showResult(castNodeType(pNode["content"])) ++")"
+  | Ok(MjParenthesisNode(pNode)) => `(${showResult(castNodeType(pNode["content"]))})`
   | Ok(MjFunctionNode(fNode)) =>
       fNode -> showFunctionNode
   | Ok(MjOperatorNode(opNode)) =>
       opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
 }
 and let showFunctionNode = (fnode: functionNode): string =>
-  fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
+  `${fnode["fn"]}(${fnode["args"]->showNodeArray})`
 and let showNodeArray = (nodeArray: array<node>): string =>
   nodeArray
   -> Belt.Array.map( a => showResult(castNodeType(a)) )

@@ -16,6 +16,6 @@ let jsToCtv = (jsValue): result<codeTreeValue, reducerError> => {
   | "boolean" => jsValue -> castBool -> CTV.CtvBool -> Ok
   | "number" => jsValue -> castNumber -> CTV.CtvNumber -> Ok
   | "string" => jsValue -> castString -> CTV.CtvString -> Ok
-  | other => Rerr.RerrTodo("Unhandled MathJs literal type: "++Js.String.make(other)) -> Error
+  | other => Rerr.RerrTodo(`Unhandled MathJs literal type: ${Js.String.make(other)}`) -> Error
   }
 }

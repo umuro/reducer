@@ -15,18 +15,16 @@ type reducerError = Rerr.reducerError
   Shows the Lisp Code as text lisp code
 */
 let rec show = codeTree => switch codeTree {
-| T.CtList(aList) => "("
-  ++ (Belt.List.map(aList, aValue => show(aValue))
+| T.CtList(aList) => `(${(Belt.List.map(aList, aValue => show(aValue))
     -> RLE.interperse(" ")
-    -> Belt.List.toArray -> Js.String.concatMany(""))
-  ++ ")"
-| CtSymbol(aSymbol) => ":" ++ aSymbol
+    -> Belt.List.toArray -> Js.String.concatMany(""))})`
+| CtSymbol(aSymbol) => `:${aSymbol}`
 | CtValue(aValue) => CTV.show(aValue)
 }
 
 let showResult = (codeResult) => switch codeResult {
-| Ok(a) => "Ok("++ show(a) ++")"
-| Error(m) => "Error("++ Js.String.make(m) ++")"
+| Ok(a) => `Ok(${show(a)})`
+| Error(m) => `Error(${Js.String.make(m)})`
 }
 
 /*
