@@ -52,7 +52,6 @@ let execList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
   switch lisp {
   | list{CtValue(CtvSymbol(fname)), ...args} => {
       let aCall = (fname, args->stripArgs )
-      // Ok(CtValue(CTV.CtvString("result_of_fname")))
       Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
     }
   | _ => lisp -> stripArgs
