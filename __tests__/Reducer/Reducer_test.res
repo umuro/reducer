@@ -25,10 +25,13 @@ describe("parse", () => {
   })
   describe("arrays", () => {
     //Note. () is a empty list in Lisp
-    // The only builtin structure in Lisp is list
+    //  The only builtin structure in Lisp is list. There are no arrays
+    //  [1,2,3] becomes (1 2 3)
     test("empty", () => expectParseToBe( "[]", "Ok(())" ) )
-    Skip.test("[1, 2, 3]", () => expectParseToBe( "[1, 2, 3]", "Ok([1, 2, 3])" ) )
-    Skip.test("['hello', 'world']", () => expectParseToBe( "['hello', 'world']", "?" ) )
+    test("[1, 2, 3]", () => expectParseToBe( "[1, 2, 3]", "Ok((1 2 3))" ) )
+    test("['hello', 'world']", () =>
+      expectParseToBe( "['hello', 'world']", "Ok(('hello' 'world'))"
+ ) )
   })
 })
 
