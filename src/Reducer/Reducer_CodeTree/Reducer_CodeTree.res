@@ -43,7 +43,7 @@ type bindings = MapString.t<unit>
 let defaultBindings: bindings = MapString.fromArray([])
 // TODO Define bindings for function execution context
 
-let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
+let reduceList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
 
   let stripArgs = (args): list<codeTreeValue> =>
     Belt.List.map(args, a =>
@@ -81,7 +81,7 @@ and let execLispList = ( list: list<codeTree>, bindings ) => {
     )
   )
   -> Result.map(aList => Belt.List.reverse(aList))
-  -> Result.flatMap(aList => execFunctionCall(aList, bindings))
+  -> Result.flatMap(aList => reduceList(aList, bindings))
 }
 
 let evalWBindingsCodeTree = (aCodeTree, bindings): result<codeTreeValue, 'e> =>
