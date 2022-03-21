@@ -12,7 +12,6 @@ type rec codeTreeValue =
 | CtvString(string)
 | CtvSymbol(string)
 | CtvArray(array<codeTreeValue>)
-| CtvUndefined
 
 type functionCall  = (string, array<codeTreeValue>)
 
@@ -29,7 +28,6 @@ let rec show = aValue => switch aValue {
         -> BList.toArray
         -> Js.String.concatMany("")
       `[${args}]`}
-  | CtvUndefined => "Undefined"
 }
 
 let showArgs = (args: array<codeTreeValue>): string => {
