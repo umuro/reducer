@@ -49,7 +49,7 @@ describe("eval", () => {
   describe("arrays", () => {
     //Note. () is a empty list in Lisp
     // The only builtin structure in Lisp is list
-    Skip.test("empty", () => expectEvalToBe( "[]", "Ok([])" ) )
+    test("empty", () => expectEvalToBe( "[]", "Ok([])" ) )
     Skip.test("[1, 2, 3]", () => expectEvalToBe( "[1, 2, 3]", "Ok([1, 2, 3])" ) )
     Skip.test("['hello', 'world']", () => expectEvalToBe( "['hello', 'world']", "?" ) )
   })

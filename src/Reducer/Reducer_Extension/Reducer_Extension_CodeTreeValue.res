@@ -6,18 +6,27 @@ module BList = Belt.List
 module LE = Reducer_ListExt
 module Rerr = Reducer_Error
 
-type codeTreeValue =
+type rec codeTreeValue =
 | CtvBool(bool)
 | CtvNumber(float)
 | CtvString(string)
+| CtvArray(array<codeTreeValue>)
 | CtvUndefined
 
 type functionCall  = (string, array<codeTreeValue>)
 
-let show = aValue => switch aValue {
+let rec show = aValue => switch aValue {
   | CtvBool( aBool ) => Js.String.make( aBool )
   | CtvNumber( aNumber ) => Js.String.make( aNumber )
   | CtvString( aString ) => "'" ++ aString++ "'"
+  | CtvArray( anArray ) => {
+      let args = anArray
+        -> BList.fromArray
+        -> BList.map(each => show(each))
+        -> LE.interperse(", ")
+        -> BList.toArray
+        -> Js.String.concatMany("")
+      "[" ++ args ++ "]"}
   | CtvUndefined => "Undefined"
 }
 

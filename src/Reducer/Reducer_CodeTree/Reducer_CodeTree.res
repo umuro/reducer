@@ -43,35 +43,33 @@ type bindings = MapString.t<unit>
 let defaultBindings: bindings = MapString.fromArray([])
 // TODO Define bindings for function execution context
 
-let reduceList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
+let execList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
 
-  let stripArgs = (args): list<codeTreeValue> =>
+  let rec stripArgs = (args: list<codeTree>): array<codeTreeValue> =>
     Belt.List.map(args, a =>
       switch a {
         | T.CtValue(aValue) => aValue
-        | _ => CTV.CtvUndefined
-      })
+        | T.CtSymbol(_) => CTV.CtvUndefined
+        | T.CtList(sublist) => sublist -> stripArgs -> CTV.CtvArray
+      }) -> Belt.List.toArray
 
-  if Js.List.isEmpty( lisp ) {
-    Rerr.RerrTodo("Got nothing")->Error
-  } else {
-    switch List.hd( lisp ) {
-    | CtSymbol(fname) => {
-        let aCall = (fname, List.tl(lisp)->stripArgs->Belt.List.toArray )
-        // Ok(CtValue(CTV.CtvString("result_of_fname")))
-        Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
-      }
-    | _ => Rerr.RerrTodo("User space functions not yet allowed")->Error
+  switch lisp {
+  | list{CtSymbol(fname), ...args} => {
+      let aCall = (fname, args->stripArgs )
+      // Ok(CtValue(CTV.CtvString("result_of_fname")))
+      Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
     }
+  | _ => lisp -> stripArgs
+    -> CTV.CtvArray -> T.CtValue -> Ok
   }
 
 }
 
 let rec execCodeTree = (aCodeTree, bindings): result<codeTree, 'e> => switch aCodeTree {
-  | T.CtList( aList ) => execLispList( aList, bindings )
+  | T.CtList( aList ) => reduceLispList( aList, bindings )
   | x => x -> Ok
 }
-and let execLispList = ( list: list<codeTree>, bindings ) => {
+and let reduceLispList = ( list: list<codeTree>, bindings ) => {
   Belt.List.reduce(list, Ok(list{}), (racc, currCode) =>
   racc
     -> Result.flatMap( acc =>
@@ -81,7 +79,7 @@ and let execLispList = ( list: list<codeTree>, bindings ) => {
     )
   )
   -> Result.map(aList => Belt.List.reverse(aList))
-  -> Result.flatMap(aList => reduceList(aList, bindings))
+  -> Result.flatMap(aList => execList(aList, bindings))
 }
 
 let evalWBindingsCodeTree = (aCodeTree, bindings): result<codeTreeValue, 'e> =>
