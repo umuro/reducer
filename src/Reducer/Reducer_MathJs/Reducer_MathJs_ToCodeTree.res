@@ -48,7 +48,7 @@ and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
       )
   ) -> Result.map(aList => Belt.List.reverse(aList))
 and let caseFunctionNode = (fNode) => {
-  let lispName = fNode["fn"] -> CTT.CtSymbol
+  let lispName = fNode["fn"] -> CTV.CtvSymbol -> CTT.CtValue
   let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
   lispArgs
   -> Result.map( aList => list{lispName, ...aList} -> CTT.CtList )

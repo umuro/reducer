@@ -10,6 +10,7 @@ type rec codeTreeValue =
 | CtvBool(bool)
 | CtvNumber(float)
 | CtvString(string)
+| CtvSymbol(string)
 | CtvArray(array<codeTreeValue>)
 | CtvUndefined
 
@@ -19,6 +20,7 @@ let rec show = aValue => switch aValue {
   | CtvBool( aBool ) => Js.String.make( aBool )
   | CtvNumber( aNumber ) => Js.String.make( aNumber )
   | CtvString( aString ) => `'${aString}'`
+  | CtvSymbol( aString ) => `:${aString}`
   | CtvArray( anArray ) => {
       let args = anArray
         -> BList.fromArray

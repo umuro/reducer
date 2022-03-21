@@ -18,7 +18,6 @@ let rec show = codeTree => switch codeTree {
 | T.CtList(aList) => `(${(Belt.List.map(aList, aValue => show(aValue))
     -> RLE.interperse(" ")
     -> Belt.List.toArray -> Js.String.concatMany(""))})`
-| CtSymbol(aSymbol) => `:${aSymbol}`
 | CtValue(aValue) => CTV.show(aValue)
 }
 
@@ -47,12 +46,11 @@ let execList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
     Belt.List.map(args, a =>
       switch a {
         | T.CtValue(aValue) => aValue
-        | T.CtSymbol(_) => CTV.CtvUndefined
         | T.CtList(sublist) => sublist -> stripArgs -> CTV.CtvArray
       }) -> Belt.List.toArray
 
   switch lisp {
-  | list{CtSymbol(fname), ...args} => {
+  | list{CtValue(CtvSymbol(fname)), ...args} => {
       let aCall = (fname, args->stripArgs )
       // Ok(CtValue(CTV.CtvString("result_of_fname")))
       Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
