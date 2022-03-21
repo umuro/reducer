@@ -2,6 +2,7 @@
   MathJs Nodes
 */
 module JsG = Reducer_Js_Gate
+module RLE = Reducer_ListExt
 module Rerr = Reducer_Error
 
 type node = {
@@ -71,10 +72,34 @@ type mjNode =
   | MjOperatorNode(operatorNode)
   | MjParenthesisNode(parenthesisNode)
 
-let castNodeType = (node) => switch node["type"] {
+let castNodeType = (node: node) => switch node["type"] {
   | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
+  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
   | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
-  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
   | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
+}
+
+let rec showResult = (rmjnode: result<mjNode, Rerr.reducerError>): string => switch rmjnode {
+  | Error(e) => Rerr.showError(e)
+  | Ok(MjConstantNode(cnode)) => Js.String.make(cnode["value"])
+  | Ok(MjParenthesisNode(pnode)) => "("++ showResult(castNodeType(pnode["content"])) ++")"
+  | Ok(MjFunctionNode(fnode)) => fnode["fn"]++"("
+    ++ (
+      fnode["args"]
+      -> Belt.Array.map( a => showResult(castNodeType(a)) )
+      -> Belt.List.fromArray
+      -> RLE.interperse(", ")
+      -> Belt.List.toArray
+      -> Js.String.concatMany("")
+    ) ++")"
+  | Ok(MjOperatorNode(fnode)) => fnode["fn"]++"("
+      ++ (
+        fnode["args"]
+        -> Belt.Array.map( a => showResult(castNodeType(a)) )
+        -> Belt.List.fromArray
+        -> RLE.interperse(", ")
+        -> Belt.List.toArray
+        -> Js.String.concatMany("")
+      ) ++")"
 }
