@@ -26,5 +26,5 @@ describe("errors", () => {
   -> toEqual(Error(Rerr.RerrJs(Some("Undefined function testZadanga"), Some("Error")))))
 
   test("unknown answer type", () => expect(ME.eval("1+1i"))
-  -> toEqual(Error(Rerr.RerrTodo("Unhandled MathJs type: object"))))
+  -> toEqual(Error(Rerr.RerrTodo("Unhandled MathJs literal type: object"))))
 })

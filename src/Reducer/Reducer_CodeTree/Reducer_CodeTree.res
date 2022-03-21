@@ -1,67 +1,21 @@
 module BuiltIn = Reducer_Dispatch_BuiltIn
+module T = Reducer_CodeTree_T
 module CTV = Reducer_Extension.CodeTreeValue
-module JsG = Reducer_Js_Gate
+module MJ = Reducer_MathJs_Parse
+module MJT = Reducer_MathJs_ToCodeTree
 module RLE = Reducer_ListExt
 module Rerr = Reducer_Error
-
 module Result = Belt.Result
 
+type codeTree = T.codeTree
 type codeTreeValue = CTV.codeTreeValue
-
-type rec codeTree =
-| CtList(list<codeTree>)  // A list to map-reduce
-| CtValue(codeTreeValue)      // Irreducable built-in value. Reducer should not know the internals
-| CtSymbol(string)        // A symbol. Defined in local bindings
-
-module MJ = Reducer_MathJs_Parse
-
-// TODO:
-// AccessorNode
-// ArrayNode
-// AssignmentNode
-// BlockNode
-// ConditionalNode
-// FunctionAssignmentNode
-// IndexNode
-// ObjectNode
-// RangeNode
-// RelationalNode
-// SymbolNode
-let rec fromNode =
-  (mjnode: MJ.node): result<codeTree, Rerr.reducerError> =>
-    switch MJ.castNodeType(mjnode) {
-      | Ok(MjConstantNode(cNode)) =>
-        cNode["value"]-> JsG.jsToCtv -> Result.map( v => v->CtValue)
-      | Ok(MjFunctionNode(fNode)) => {
-        let lispName = fNode["fn"] -> CtSymbol
-        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-        lispArgs
-        -> Result.map( aList => list{lispName, ...aList} -> CtList )
-        }
-      | Ok(MjOperatorNode(fNode)) => {
-        let lispName = fNode["fn"] -> CtSymbol
-        let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-        lispArgs
-        -> Result.map( aList => list{lispName, ...aList} -> CtList )
-        }
-      | Ok(MjParenthesisNode(pNode)) => pNode["content"] -> fromNode
-      | Error(x) => Error(x)
-    }
-and let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
-  Belt.List.reduce(nodeList, Ok(list{}), (racc, currNode) =>
-    racc
-      -> Result.flatMap( acc =>
-        fromNode(currNode)
-          -> Result.map(newCode => list{newCode, ...acc}
-          )
-      )
-  ) -> Result.map(aList => Belt.List.reverse(aList))
+type reducerError = Rerr.reducerError
 
 /*
   Shows the Lisp Code as text lisp code
 */
 let rec show = codeTree => switch codeTree {
-| CtList(aList) => "("
+| T.CtList(aList) => "("
   ++ (Belt.List.map(aList, aValue => show(aValue))
     -> RLE.interperse(" ")
     -> Belt.List.toArray -> Js.String.concatMany(""))
@@ -78,8 +32,8 @@ let showResult = (codeResult) => switch codeResult {
 /*
   Converts a MathJs code to Lisp Code
 */
-let parse = (mathJsCode: string): result<codeTree, Rerr.reducerError> =>
-  mathJsCode -> MJ.parse -> Result.flatMap(node => fromNode(node))
+let parse = (mathJsCode: string): result<codeTree, reducerError> =>
+  mathJsCode -> MJ.parse -> Result.flatMap(node => MJT.fromNode(node))
 
 module MapString = Belt.Map.String
 type bindings = MapString.t<unit>
@@ -88,10 +42,10 @@ let defaultBindings: bindings = MapString.fromArray([])
 
 let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
 
-  let stripArgs = (args): list<CTV.codeTreeValue> =>
+  let stripArgs = (args): list<codeTreeValue> =>
     Belt.List.map(args, a =>
       switch a {
-        | CtValue(aValue) => aValue
+        | T.CtValue(aValue) => aValue
         | _ => CTV.CtvUndefined
       })
 
@@ -102,7 +56,7 @@ let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e>
     | CtSymbol(fname) => {
         let aCall = (fname, List.tl(lisp)->stripArgs->Belt.List.toArray )
         // Ok(CtValue(CTV.CtvString("result_of_fname")))
-        Result.map( BuiltIn.dispatch(aCall), aValue => CtValue(aValue))
+        Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
       }
     | _ => Rerr.RerrTodo("User space functions not yet allowed")->Error
     }
@@ -111,7 +65,7 @@ let execFunctionCall = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e>
 }
 
 let rec execCodeTree = (aCodeTree, bindings): result<codeTree, 'e> => switch aCodeTree {
-  | CtList( aList ) => execLispList( aList, bindings )
+  | T.CtList( aList ) => execLispList( aList, bindings )
   | x => x -> Ok
 }
 and let execLispList = ( list: list<codeTree>, bindings ) => {

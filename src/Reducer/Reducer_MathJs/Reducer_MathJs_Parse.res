@@ -1,9 +1,12 @@
 /*
   MathJs Nodes
+  We make MathJs Nodes strong-typed
 */
 module JsG = Reducer_Js_Gate
 module RLE = Reducer_ListExt
 module Rerr = Reducer_Error
+
+type reducerError = Rerr.reducerError
 
 type node = {
   "type": string,
@@ -12,6 +15,12 @@ type node = {
 }
 //accessorNode
 //arrayNode
+type arrayNode = {
+  ...node,
+  "items": array<node>
+}
+external castArrayNode: node => arrayNode = "%identity"
+
 //assignmentNode
 //blockNode
 //conditionalNode
@@ -58,7 +67,7 @@ external castParenthesisNode: node => parenthesisNode = "%identity"
 */
 @module("mathjs") external parse__: string => node = "parse"
 
-let parse = (expr: string): result<node, Rerr.reducerError> =>
+let parse = (expr: string): result<node, reducerError> =>
   try {
     Ok(parse__(expr))
   } catch {
@@ -67,39 +76,33 @@ let parse = (expr: string): result<node, Rerr.reducerError> =>
   }
 
 type mjNode =
+  | MjArrayNode(arrayNode)
   | MjConstantNode(constantNode)
   | MjFunctionNode(functionNode)
   | MjOperatorNode(operatorNode)
   | MjParenthesisNode(parenthesisNode)
 
 let castNodeType = (node: node) => switch node["type"] {
+  | "ArrayNode" => node -> castArrayNode -> MjArrayNode -> Ok
   | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
-  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
   | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
+  | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
   | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
 }
 
-let rec showResult = (rmjnode: result<mjNode, Rerr.reducerError>): string => switch rmjnode {
+let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch rmjnode {
   | Error(e) => Rerr.showError(e)
+  | Ok(MjArrayNode(aNode)) => "["++ aNode["items"]->showNodeArray ++"]"
   | Ok(MjConstantNode(cnode)) => Js.String.make(cnode["value"])
   | Ok(MjParenthesisNode(pnode)) => "("++ showResult(castNodeType(pnode["content"])) ++")"
-  | Ok(MjFunctionNode(fnode)) => fnode["fn"]++"("
-    ++ (
-      fnode["args"]
-      -> Belt.Array.map( a => showResult(castNodeType(a)) )
-      -> Belt.List.fromArray
-      -> RLE.interperse(", ")
-      -> Belt.List.toArray
-      -> Js.String.concatMany("")
-    ) ++")"
-  | Ok(MjOperatorNode(fnode)) => fnode["fn"]++"("
-      ++ (
-        fnode["args"]
-        -> Belt.Array.map( a => showResult(castNodeType(a)) )
-        -> Belt.List.fromArray
-        -> RLE.interperse(", ")
-        -> Belt.List.toArray
-        -> Js.String.concatMany("")
-      ) ++")"
+  | Ok(MjFunctionNode(fnode)) => fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
+  | Ok(MjOperatorNode(fnode)) => fnode["fn"]++"("++ fnode["args"]->showNodeArray ++")"
 }
+and let showNodeArray = (nodeArray: array<node>): string =>
+  nodeArray
+  -> Belt.Array.map( a => showResult(castNodeType(a)) )
+  -> Belt.List.fromArray
+  -> RLE.interperse(", ")
+  -> Belt.List.toArray
+  -> Js.String.concatMany("")

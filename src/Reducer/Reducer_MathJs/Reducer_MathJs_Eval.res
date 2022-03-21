@@ -2,6 +2,9 @@ module CTV = Reducer_Extension.CodeTreeValue
 module JsG = Reducer_Js_Gate
 module Rerr = Reducer_Error
 
+type codeTreeValue = CTV.codeTreeValue
+type reducerError = Rerr.reducerError
+
 @module("mathjs") external dummy_: string => unit = "evaluate"
 let dummy1_ = dummy_ //Deceive the compiler to make the import although we wont make a call from rescript. Otherwise the optimizer deletes the import
 
@@ -19,7 +22,7 @@ let eval__ = %raw(`function (expr) { return {value: Mathjs.evaluate(expr)}; }`)
 /*
   Call MathJs evaluate and return as a variant
 */
-let eval = (expr: string): result<CTV.codeTreeValue, Rerr.reducerError> => {
+let eval = (expr: string): result<codeTreeValue, reducerError> => {
   try {
   let answer = eval__(expr)
   answer["value"]->JsG.jsToCtv
