@@ -12,8 +12,7 @@ external castString: unit => string = "%identity"
   As JavaScript returns us any type, we need to type check and cast type propertype before using it
 */
 let jsToCtv = (jsValue): result<codeTreeValue, reducerError> => {
-  let typeString = %raw(`typeof jsValue`)
-  switch typeString {
+  switch Js.typeof(jsValue) {
   | "boolean" => jsValue -> castBool -> CTV.CtvBool -> Ok
   | "number" => jsValue -> castNumber -> CTV.CtvNumber -> Ok
   | "string" => jsValue -> castString -> CTV.CtvString -> Ok
