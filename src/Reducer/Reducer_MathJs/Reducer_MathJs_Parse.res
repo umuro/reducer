@@ -90,10 +90,16 @@ let castNodeType = (node: node) => switch node["type"] {
   | _ => Rerr.RerrTodo("Argg, unhandled MathJsNode: " ++ node["type"])-> Error
 }
 
+let showValue = (a: 'a): string => if (Js.typeof(a) == "string") {
+  "'"++Js.String.make(a)++"'"
+} else {
+  Js.String.make(a)
+}
+
 let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch rmjnode {
   | Error(e) => Rerr.showError(e)
   | Ok(MjArrayNode(aNode)) => "["++ aNode["items"]->showNodeArray ++"]"
-  | Ok(MjConstantNode(cNode)) => Js.String.make(cNode["value"])
+  | Ok(MjConstantNode(cNode)) => cNode["value"]->showValue
   | Ok(MjParenthesisNode(pNode)) => "("++ showResult(castNodeType(pNode["content"])) ++")"
   | Ok(MjFunctionNode(fNode)) =>
       fNode -> showFunctionNode
