@@ -2,38 +2,40 @@
   Irreducable values. Reducer does not know about those. Only used for external calls
   This is a configuration to to make external calls of those types
 */
-module BA = Belt.Array
-module BList = Belt.List
-module LE = Reducer_ListExt
+module AE = Reducer_ArrayExt
 module Rerr = Reducer_Error
 
-type codeTreeValue =
+type rec codeTreeValue =
 | CtvBool(bool)
 | CtvNumber(float)
 | CtvString(string)
-| CtvUndefined
+| CtvSymbol(string)
+| CtvArray(array<codeTreeValue>)
 
 type functionCall  = (string, array<codeTreeValue>)
 
-let show = aValue => switch aValue {
+let rec show = aValue => switch aValue {
   | CtvBool( aBool ) => Js.String.make( aBool )
   | CtvNumber( aNumber ) => Js.String.make( aNumber )
-  | CtvString( aString ) => "'" ++ aString++ "'"
-  | CtvUndefined => "Undefined"
+  | CtvString( aString ) => `'${aString}'`
+  | CtvSymbol( aString ) => `:${aString}`
+  | CtvArray( anArray ) => {
+      let args = anArray
+        -> Belt.Array.map(each => show(each))
+        -> AE.interperse(", ")
+        -> Js.String.concatMany("")
+      `[${args}]`}
 }
 
 let showArgs = (args: array<codeTreeValue>): string => {
   args
-  -> BList.fromArray
-  -> BList.map(arg => arg->show)
-  -> LE.interperse(", ")
-  -> BList.toArray
+  -> Belt.Array.map(arg => arg->show)
+  -> AE.interperse(", ")
   -> Js.String.concatMany("") }
 
-let showFunctionCall = ((fn, args)): string =>
-  fn ++ "("++showArgs(args)++")"
+let showFunctionCall = ((fn, args)): string => `${fn}(${ showArgs(args) })`
 
 let showResult = (x) => switch x {
-  | Ok(a) => "Ok("++ show(a)++")"
-  | Error(m) => "Error("++ Rerr.showError(m) ++")"
+  | Ok(a) => `Ok(${ show(a) })`
+  | Error(m) => `Error(${Rerr.showError(m)})`
 }

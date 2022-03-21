@@ -12,7 +12,7 @@ describe("MathJs parse", () => {
 
   describe("literals operators paranthesis", () => {
     test("1", () => expectParseToBe("1", "1") )
-    test("'hello'", () => expectParseToBe("'hello'", "hello") )
+    test("'hello'", () => expectParseToBe("'hello'", "'hello'") )
     test("true", () => expectParseToBe("true", "true") )
     test("1+2", () => expectParseToBe("1+2", "add(1, 2)") )
     test("add(1,2)", () => expectParseToBe("add(1,2)", "add(1, 2)") )
@@ -31,8 +31,8 @@ describe("MathJs parse", () => {
   })
 
   describe( "arrays", () => {
-    Skip.test("empty", () => expectParseToBe("[]", "???") )
-    Skip.test("define", () => expectParseToBe("[0,1,2]", "???") )
+    test("empty", () => expectParseToBe("[]", "[]") )
+    test("define", () => expectParseToBe("[0, 1, 2]", "[0, 1, 2]") )
     Skip.test("define with strings", () => expectParseToBe("['hello', 'world']", "???") )
     Skip.test("range", () => expectParseToBe("range(0, 4)", "???") )
     Skip.test("use", () => expectParseToBe("[1,2,3], index(1))", "???") )

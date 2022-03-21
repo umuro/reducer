@@ -5,9 +5,12 @@ module Rerr = Reducer_Error
 /*
   MathJs provides default implementations for external calls
 */
+type codeTreeValue = CTV.codeTreeValue
+type reducerError = Rerr.reducerError
+
 exception TestRescriptException
 
-let callMatjJs = (call: CTV.functionCall): result<'b, Rerr.reducerError> =>
+let callMatjJs = (call: CTV.functionCall): result<'b, reducerError> =>
   switch call {
     | ("jsraise", [msg]) => Js.Exn.raiseError(CTV.show(msg)) // For Tests
     | ("resraise", _) => raise(TestRescriptException) // For Tests
@@ -17,7 +20,7 @@ let callMatjJs = (call: CTV.functionCall): result<'b, Rerr.reducerError> =>
 /*
   Lisp engine uses Result monad while reducing expressions
 */
-let dispatch = (call: CTV.functionCall): result<CTV.codeTreeValue, Rerr.reducerError> =>
+let dispatch = (call: CTV.functionCall): result<codeTreeValue, reducerError> =>
   try {
     let (fn, args) = call
     // There is a bug that prevents string match in patterns
