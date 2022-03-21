@@ -32,8 +32,11 @@ let showResult = (codeResult) => switch codeResult {
 /*
   Converts a MathJs code to Lisp Code
 */
+let parse_ = (expr: string, parser, converter): result<codeTree, reducerError> =>
+  expr -> parser -> Result.flatMap(node => converter(node))
+
 let parse = (mathJsCode: string): result<codeTree, reducerError> =>
-  mathJsCode -> MJ.parse -> Result.flatMap(node => MJT.fromNode(node))
+  mathJsCode -> parse_( MJ.parse, MJT.fromNode )
 
 module MapString = Belt.Map.String
 type bindings = MapString.t<unit>
