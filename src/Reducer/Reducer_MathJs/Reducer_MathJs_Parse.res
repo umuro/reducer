@@ -93,10 +93,10 @@ let castNodeType = (node: node) => switch node["type"] {
 let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch rmjnode {
   | Error(e) => Rerr.showError(e)
   | Ok(MjArrayNode(aNode)) => "["++ aNode["items"]->showNodeArray ++"]"
-  | Ok(MjConstantNode(cnode)) => Js.String.make(cnode["value"])
-  | Ok(MjParenthesisNode(pnode)) => "("++ showResult(castNodeType(pnode["content"])) ++")"
-  | Ok(MjFunctionNode(fnode)) =>
-      fnode -> showFunctionNode
+  | Ok(MjConstantNode(cNode)) => Js.String.make(cNode["value"])
+  | Ok(MjParenthesisNode(pNode)) => "("++ showResult(castNodeType(pNode["content"])) ++")"
+  | Ok(MjFunctionNode(fNode)) =>
+      fNode -> showFunctionNode
   | Ok(MjOperatorNode(opNode)) =>
       opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
 }

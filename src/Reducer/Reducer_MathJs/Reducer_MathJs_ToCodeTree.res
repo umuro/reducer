@@ -11,7 +11,6 @@ type reducerError = Rerr.reducerError
 
 // TODO:
 // AccessorNode
-// ArrayNode
 // AssignmentNode
 // BlockNode
 // ConditionalNode
@@ -25,12 +24,17 @@ type reducerError = Rerr.reducerError
 let rec fromNode =
   (mjnode: MJ.node): result<codeTree, reducerError> =>
     switch MJ.castNodeType(mjnode) {
+      | Ok(MjArrayNode(aNode)) =>
+          aNode["items"]
+          -> Belt.List.fromArray
+          -> fromNodeList
+          -> Result.map(list => CTT.CtList(list))
       | Ok(MjConstantNode(cNode)) =>
-        cNode["value"]-> JsG.jsToCtv -> Result.map( v => v->CTT.CtValue)
+          cNode["value"]-> JsG.jsToCtv -> Result.map( v => v->CTT.CtValue)
       | Ok(MjFunctionNode(fNode)) => fNode
-        -> caseFunctionNode
+          -> caseFunctionNode
       | Ok(MjOperatorNode(opNode)) => opNode
-        ->  MJ.castOperatorNodeToFunctionNode  -> caseFunctionNode
+          ->  MJ.castOperatorNodeToFunctionNode  -> caseFunctionNode
       | Ok(MjParenthesisNode(pNode)) => pNode["content"] -> fromNode
       | Error(x) => Error(x)
     }
