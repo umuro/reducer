@@ -2,8 +2,7 @@ module MJ=Reducer.MathJs.Parse
 module Result = Belt.Result
 
 open Jest
-// open Expect
-open ExpectJs
+open Expect
 
 let expectParseToBe = (expr, answer) =>
   MJ.parse(expr) -> Result.flatMap(MJ.castNodeType) -> MJ.showResult
