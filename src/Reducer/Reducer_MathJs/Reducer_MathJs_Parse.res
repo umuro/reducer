@@ -44,10 +44,8 @@ external castFunctionNode: node => functionNode = "%identity"
 //objectNode
 //operatorNode
 type operatorNode = {
-  ...node,
+  ...functionNode,
   "op": string,
-  "fn": string,
-  "args": array<node>
 }
 external castOperatorNode: node => operatorNode = "%identity"
 
