@@ -2,8 +2,8 @@
   MathJs Nodes
   We make MathJs Nodes strong-typed
 */
+module AE = Reducer_ArrayExt
 module JsG = Reducer_Js_Gate
-module RLE = Reducer_ListExt
 module Rerr = Reducer_Error
 
 type reducerError = Rerr.reducerError
@@ -111,7 +111,5 @@ and let showFunctionNode = (fnode: functionNode): string =>
 and let showNodeArray = (nodeArray: array<node>): string =>
   nodeArray
   -> Belt.Array.map( a => showResult(castNodeType(a)) )
-  -> Belt.List.fromArray
-  -> RLE.interperse(", ")
-  -> Belt.List.toArray
+  -> AE.interperse(", ")
   -> Js.String.concatMany("")

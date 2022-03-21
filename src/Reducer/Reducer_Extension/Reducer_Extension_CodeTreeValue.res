@@ -2,8 +2,7 @@
   Irreducable values. Reducer does not know about those. Only used for external calls
   This is a configuration to to make external calls of those types
 */
-module BList = Belt.List
-module LE = Reducer_ListExt
+module AE = Reducer_ArrayExt
 module Rerr = Reducer_Error
 
 type rec codeTreeValue =
@@ -22,20 +21,16 @@ let rec show = aValue => switch aValue {
   | CtvSymbol( aString ) => `:${aString}`
   | CtvArray( anArray ) => {
       let args = anArray
-        -> BList.fromArray
-        -> BList.map(each => show(each))
-        -> LE.interperse(", ")
-        -> BList.toArray
+        -> Belt.Array.map(each => show(each))
+        -> AE.interperse(", ")
         -> Js.String.concatMany("")
       `[${args}]`}
 }
 
 let showArgs = (args: array<codeTreeValue>): string => {
   args
-  -> BList.fromArray
-  -> BList.map(arg => arg->show)
-  -> LE.interperse(", ")
-  -> BList.toArray
+  -> Belt.Array.map(arg => arg->show)
+  -> AE.interperse(", ")
   -> Js.String.concatMany("") }
 
 let showFunctionCall = ((fn, args)): string => `${fn}(${ showArgs(args) })`
