@@ -44,7 +44,7 @@ external castFunctionNode: node => functionNode = "%identity"
 //objectNode
 type objectNode = {
   ...node,
-  "properties": {..}
+  "properties": Js.Dict.t<node>
 }
 external castObjectNode: node => objectNode = "%identity"
 //operatorNode
@@ -97,29 +97,44 @@ let castNodeType = (node: node) => switch node["type"] {
   | _ => Rerr.RerrTodo(`Argg, unhandled MathJsNode: ${node["type"]}`)-> Error
 }
 
-let showValue = (a: 'a): string => if (Js.typeof(a) == "string") {
-  `'${Js.String.make(a)}'`
-} else {
-  Js.String.make(a)
-}
+let rec show = (mjNode: mjNode): string => {
+  let showValue = (a: 'a): string => if (Js.typeof(a) == "string") {
+    `'${Js.String.make(a)}'`
+  } else {
+    Js.String.make(a)
+  }
 
-let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch rmjnode {
-  | Error(e) => Rerr.showError(e)
-  | Ok(MjArrayNode(aNode)) => `[${aNode["items"]->showNodeArray}]`
-  | Ok(MjConstantNode(cNode)) => cNode["value"]->showValue
-  | Ok(MjObjectNode(oNode)) => oNode -> showObjectNode
-  | Ok(MjParenthesisNode(pNode)) => `(${showResult(castNodeType(pNode["content"]))})`
-  | Ok(MjFunctionNode(fNode)) =>
+  let showNodeArray = (nodeArray: array<node>): string =>
+    nodeArray
+    -> Belt.Array.map( a => showResult(castNodeType(a)) )
+    -> AE.interperse(", ")
+    -> Js.String.concatMany("")
+
+  let showFunctionNode = (fnode: functionNode): string =>
+    `${fnode["fn"]}(${fnode["args"]->showNodeArray})`
+
+  let showObjectEntry = ( (key: string, value: node) ): string =>
+    `${key}: ${value->castNodeType->showResult}`
+
+  let showObjectNode = (oNode: objectNode): string =>
+    `{${  oNode["properties"]
+          ->Js.Dict.entries
+          ->Belt.Array.map(entry=>entry->showObjectEntry)
+          ->AE.interperse(", ")->Js.String.concatMany("")
+    }}`
+
+  switch mjNode {
+  | MjArrayNode(aNode) => `[${aNode["items"]->showNodeArray}]`
+  | MjConstantNode(cNode) => cNode["value"]->showValue
+  | MjObjectNode(oNode) => oNode -> showObjectNode
+  | MjParenthesisNode(pNode) => `(${showResult(castNodeType(pNode["content"]))})`
+  | MjFunctionNode(fNode) =>
       fNode -> showFunctionNode
-  | Ok(MjOperatorNode(opNode)) =>
+  | MjOperatorNode(opNode) =>
       opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
+}}
+and let showResult = (rmjnode: result<mjNode, reducerError>): string =>
+switch rmjnode {
+  | Error(e) => Rerr.showError(e)
+  | Ok(mjNode) => show(mjNode)
 }
-and let showFunctionNode = (fnode: functionNode): string =>
-  `${fnode["fn"]}(${fnode["args"]->showNodeArray})`
-and let showNodeArray = (nodeArray: array<node>): string =>
-  nodeArray
-  -> Belt.Array.map( a => showResult(castNodeType(a)) )
-  -> AE.interperse(", ")
-  -> Js.String.concatMany("")
-and let showObjectNode = (oNode: objectNode): string =>
-  `{${oNode["properties"]->Js.Obj.keys->AE.interperse(", ")->Js.String.concatMany("")}}`
