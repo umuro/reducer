@@ -40,50 +40,43 @@ type bindings = MapString.t<unit>
 let defaultBindings: bindings = MapString.fromArray([])
 // TODO Define bindings for function execution context
 
-let execList = ( lisp: list<codeTree>, _bindings ): result<codeTree, 'e> => {
+/*
+  After reducing each level of code tree, we have a value list to evaluate
+*/
+let reduceValueList = (valueList: list<codeTreeValue>): result<codeTreeValue, 'e> =>
+      switch valueList {
+        | list{CtvSymbol(fName), ...args} =>
+            (fName, args->Belt.List.toArray) -> BuiltIn.dispatch
+        | _ =>
+            valueList -> Belt.List.toArray -> CTV.CtvArray -> Ok
+      }
 
-  let rec stripArgs = (args: list<codeTree>): array<codeTreeValue> =>
-    Belt.List.map(args, a =>
-      switch a {
-        | T.CtValue(aValue) => aValue
-        | T.CtList(sublist) => sublist -> stripArgs -> CTV.CtvArray
-      }) -> Belt.List.toArray
+/*
+  Recursively evaluate/reduce the code tree
+*/
+let rec reduceCodeTree = (codeTree: codeTree, bindings): result<codeTreeValue, 'e> =>
+  switch codeTree {
+  | T.CtValue( value ) => value -> Ok
+  | T.CtList( list ) => {
+    let racc: result<list<codeTreeValue>, 'e> = list -> Belt.List.reduceReverse(
 
-  switch lisp {
-  | list{CtValue(CtvSymbol(fname)), ...args} => {
-      let aCall = (fname, args->stripArgs )
-      Result.map( BuiltIn.dispatch(aCall), aValue => T.CtValue(aValue))
-    }
-  | _ => lisp -> stripArgs
-    -> CTV.CtvArray -> T.CtValue -> Ok
-  }
+      Ok(list{}),
+      (racc, each: codeTree) => racc->Result.flatMap( acc => {
 
-}
+                  each
+                  ->  reduceCodeTree(bindings)
+                  ->  Result.flatMap( newNode => {
+                          acc->Belt.List.add(newNode)->Ok
+                      })
 
-let rec execCodeTree = (aCodeTree, bindings): result<codeTree, 'e> => switch aCodeTree {
-  | T.CtList( aList ) => reduceLispList( aList, bindings )
-  | x => x -> Ok
-}
-and let reduceLispList = ( list: list<codeTree>, bindings ) => {
-  Belt.List.reduce(list, Ok(list{}), (racc, currCode) =>
-  racc
-    -> Result.flatMap( acc =>
-      execCodeTree(currCode, bindings)
-        -> Result.map(newCode => list{newCode, ...acc}
-        )
+      })
+
     )
-  )
-  -> Result.map(aList => Belt.List.reverse(aList))
-  -> Result.flatMap(aList => execList(aList, bindings))
-}
+    racc -> Result.flatMap( acc => acc->reduceValueList )}
+  }
 
 let evalWBindingsCodeTree = (aCodeTree, bindings): result<codeTreeValue, 'e> =>
-  Result.flatMap( execCodeTree(aCodeTree, bindings),
-  aCode => switch aCode {
-    | CtValue( aValue ) => aValue -> Ok
-    | other => RerrUnexecutedCode(show(other)) -> Error
-  }
-)
+  reduceCodeTree(aCodeTree, bindings)
 
 /*
   Evaluates MathJs code via Lisp using bindings and answers the result
