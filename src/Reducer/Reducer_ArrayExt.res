@@ -1,5 +1,5 @@
 /*
-  Insert seperator between the elements of a list
+  Insert seperator between the elements of an array
 */
 module LE = Reducer_ListExt
 
