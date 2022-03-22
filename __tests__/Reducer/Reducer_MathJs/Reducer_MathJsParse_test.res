@@ -33,8 +33,9 @@ describe("MathJs parse", () => {
   describe( "arrays", () => {
     test("empty", () => expectParseToBe("[]", "[]") )
     test("define", () => expectParseToBe("[0, 1, 2]", "[0, 1, 2]") )
-    Skip.test("define with strings", () => expectParseToBe("['hello', 'world']", "???") )
-    Skip.test("range", () => expectParseToBe("range(0, 4)", "???") )
+    test("define with strings", () =>
+      expectParseToBe("['hello', 'world']", "['hello', 'world']") )
+    Skip.test("range", () => expectParseToBe("range(0, 4)", "range(0, 4)") )
     Skip.test("use", () => expectParseToBe("[1,2,3], index(1))", "???") )
   })
 
