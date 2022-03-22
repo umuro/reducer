@@ -42,6 +42,11 @@ external castFunctionNode: node => functionNode = "%identity"
 
 //indexNode
 //objectNode
+type objectNode = {
+  ...node,
+  "properties": {..}
+}
+external castObjectNode: node => objectNode = "%identity"
 //operatorNode
 type operatorNode = {
   ...functionNode,
@@ -78,6 +83,7 @@ type mjNode =
   | MjArrayNode(arrayNode)
   | MjConstantNode(constantNode)
   | MjFunctionNode(functionNode)
+  | MjObjectNode(objectNode)
   | MjOperatorNode(operatorNode)
   | MjParenthesisNode(parenthesisNode)
 
@@ -85,6 +91,7 @@ let castNodeType = (node: node) => switch node["type"] {
   | "ArrayNode" => node -> castArrayNode -> MjArrayNode -> Ok
   | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
+  | "ObjectNode" => node -> castObjectNode -> MjObjectNode -> Ok
   | "OperatorNode" => node -> castOperatorNode -> MjOperatorNode -> Ok
   | "ParenthesisNode" => node -> castParenthesisNode -> MjParenthesisNode -> Ok
   | _ => Rerr.RerrTodo(`Argg, unhandled MathJsNode: ${node["type"]}`)-> Error
@@ -100,6 +107,7 @@ let rec showResult = (rmjnode: result<mjNode, reducerError>): string => switch r
   | Error(e) => Rerr.showError(e)
   | Ok(MjArrayNode(aNode)) => `[${aNode["items"]->showNodeArray}]`
   | Ok(MjConstantNode(cNode)) => cNode["value"]->showValue
+  | Ok(MjObjectNode(oNode)) => oNode -> showObjectNode
   | Ok(MjParenthesisNode(pNode)) => `(${showResult(castNodeType(pNode["content"]))})`
   | Ok(MjFunctionNode(fNode)) =>
       fNode -> showFunctionNode
@@ -113,3 +121,5 @@ and let showNodeArray = (nodeArray: array<node>): string =>
   -> Belt.Array.map( a => showResult(castNodeType(a)) )
   -> AE.interperse(", ")
   -> Js.String.concatMany("")
+and let showObjectNode = (oNode: objectNode): string =>
+  `{${oNode["properties"]->Js.Obj.keys->AE.interperse(", ")->Js.String.concatMany("")}}`
