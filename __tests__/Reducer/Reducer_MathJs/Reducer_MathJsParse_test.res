@@ -40,7 +40,7 @@ describe("MathJs parse", () => {
   })
 
   describe( "records", () => {
-    Skip.test("define", () => expectParseToBe("{a: 1, b: 2}", "???") )
+    test("define", () => expectParseToBe("{a: 1, b: 2}", "???") )
     Skip.test("use", () => expectParseToBe("r.prop", "???") )
   })
 
