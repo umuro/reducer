@@ -27,24 +27,15 @@ let rec fromNode =
 
       let fromNodeList = (nodeList: list<MJ.node>): result<list<codeTree>, 'e> =>
         Belt.List.reduceReverse(nodeList, Ok(list{}), (racc, currNode) =>
-          racc
-            -> Result.flatMap( acc =>
-              fromNode(currNode)
-                -> Result.map(newCode => list{newCode, ...acc})))
+          racc -> Result.flatMap(
+            acc => fromNode(currNode) -> Result.map(
+              currCode => list{currCode, ...acc})))
 
       let caseFunctionNode = (fNode) => {
-        let lispName = fNode["fn"] -> CTV.CtvSymbol -> CTT.CtValue
+        let fn = fNode["fn"] -> CTV.CtvSymbol -> CTT.CtValue
         let lispArgs = fNode["args"] -> Belt.List.fromArray -> fromNodeList
-        lispArgs
-        -> Result.map( aList => list{lispName, ...aList} -> CTT.CtList )
-      }
-
-      let caseAccessorNode = ( objectNode, index ) => {
-        let lispName = "internalAtRecordIndex" -> CTV.CtvSymbol -> CTT.CtValue
-        let lispIndex = index  -> CTV.CtvSymbol -> CTT.CtValue
-        fromNode( objectNode )
-          -> Result.map( newCode => list{lispName, newCode, lispIndex}
-                                    -> CTT.CtList )
+        lispArgs -> Result.map(
+          argsCode => list{fn, ...argsCode} -> CTT.CtList )
       }
 
       let caseObjectNode = oNode => {
@@ -71,6 +62,34 @@ let rec fromNode =
         -> fromObjectEntries
       }
 
+      let caseIndexNode = iNode => {
+          let rpropertyCodeList = Belt.List.reduceReverse(
+                                iNode["dimensions"]->Belt.List.fromArray,
+                                Ok(list{}),
+                                (racc, currentPropertyMjNode)
+                                =>
+            racc -> Result.flatMap( acc =>
+              fromNode(currentPropertyMjNode)
+              -> Result.map( propertyCode =>
+                  list{ propertyCode, ...acc} )
+            )
+          )
+          rpropertyCodeList -> Result.map(
+            propertyCodeList => CTT.CtList(propertyCodeList))
+      }
+
+      let caseAccessorNode = ( objectNode, indexNode ) => {
+        let fn = "internalAtIndex" -> CTV.CtvSymbol -> CTT.CtValue
+
+        caseIndexNode( indexNode ) -> Result.flatMap(
+          indexCode => {
+            fromNode( objectNode ) -> Result.map(
+              objectCode => list{fn, objectCode, indexCode} -> CTT.CtList )
+          }
+        )
+      }
+
+
       switch typedMjNode {
         | MjArrayNode(aNode) =>
             aNode["items"]
@@ -88,4 +107,5 @@ let rec fromNode =
         | MjObjectNode(oNode) => caseObjectNode(oNode)
         | MjSymbolNode(sNode) =>
             sNode["name"]-> CTV.CtvSymbol -> CTT.CtValue -> Ok
+        | MjIndexNode(iNode) => caseIndexNode(iNode)
       }})

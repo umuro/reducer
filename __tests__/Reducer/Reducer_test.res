@@ -22,6 +22,13 @@ describe("using mathjs parse", () => {
     test("[1, 2, 3]", () => expectParseToBe( "[1, 2, 3]", "Ok((1 2 3))"))
     test("['hello', 'world']", () =>
       expectParseToBe( "['hello', 'world']", "Ok(('hello' 'world'))"))
+    test("index", () => expectParseToBe("([0,1,2])[1]", "Ok((:internalAtIndex (0 1 2) (1)))"))
+  })
+  describe("records", () => {
+    test("define", () =>
+      expectParseToBe("{a: 1, b: 2}", "Ok((:internalConstructRecord (('a' 1) ('b' 2))))"))
+    test("use", () =>
+      expectParseToBe("record.property", "Ok((:internalAtIndex :record ('property')))"))
   })
 })
 

@@ -36,12 +36,12 @@ describe("MathJs parse", () => {
     test("define with strings", () =>
       expectParseToBe("['hello', 'world']", "['hello', 'world']"))
     Skip.test("range", () => expectParseToBe("range(0, 4)", "range(0, 4)"))
-    Skip.test("use", () => expectParseToBe("[1,2,3], index(1))", "???"))
+    test("index", () => expectParseToBe("([0,1,2])[1]", "([0, 1, 2])[1]"))
   })
 
   describe( "records", () => {
     test("define", () => expectParseToBe("{a: 1, b: 2}", "{a: 1, b: 2}"))
-    test("use", () => expectParseToBe("r.prop", "???"))
+    test("use", () => expectParseToBe("record.property", "record['property']"))
   })
 
   describe( "comments", () => {
