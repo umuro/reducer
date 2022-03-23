@@ -50,7 +50,6 @@ let callInternal = (call: CTV.functionCall): result<'b, reducerError> =>{
   | ("$atIndex", [CTV.CtvArray(aValueArray), CTV.CtvArray([CTV.CtvNumber(fIndex)])])  =>
     arrayAtIndex(aValueArray, fIndex)
   | ("$atIndex", [CTV.CtvRecord(dict), CTV.CtvArray([CTV.CtvString(sIndex)])]) => recordAtIndex(dict, sIndex)
-  | ("$atIndex", [CTV.CtvRecord(dict), CTV.CtvArray([CTV.CtvString(sIndex)])]) => (Js.String.make(dict) ++ "!~~~~" ++ sIndex)->CTV.CtvString->Ok
   | ("$atIndex", [obj, index]) => (CTV.showWithType(obj) ++ "??~~~~" ++ CTV.showWithType(index))->CTV.CtvString->Ok
   | call => callMatjJs(call)
   }
