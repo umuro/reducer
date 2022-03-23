@@ -3,7 +3,8 @@ module Lib = Reducer_Extension.ReducerLibrary
 module ME = Reducer_MathJs.Eval
 module Rerr = Reducer_Error
 /*
-  MathJs provides default implementations for external calls
+  MathJs provides default implementations for builtins
+  This is where all the expected builtins like + = * / sin cos log ln etc are handled
 */
 type codeTreeValue = CTV.codeTreeValue
 type reducerError = Rerr.reducerError
