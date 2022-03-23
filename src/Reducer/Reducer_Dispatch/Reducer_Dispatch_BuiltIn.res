@@ -5,6 +5,7 @@ module Rerr = Reducer_Error
 /*
   MathJs provides default implementations for builtins
   This is where all the expected builtins like + = * / sin cos log ln etc are handled
+  DO NOT try to add external function mapping here!
 */
 type codeTreeValue = CTV.codeTreeValue
 type reducerError = Rerr.reducerError
