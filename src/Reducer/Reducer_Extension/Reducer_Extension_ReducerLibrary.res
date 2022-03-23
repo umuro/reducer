@@ -4,7 +4,7 @@ type codeTreeValue = CTV.codeTreeValue
 
 module Sample = { // In real life real libraries should be somewhere else
   /*
-    For an example of mapping polymorphic custom functions
+    For an example of mapping polymorphic custom functions. To be deleted after real integration
   */
   let customAdd = (a:float, b:float):float => {a +. b}
 }
