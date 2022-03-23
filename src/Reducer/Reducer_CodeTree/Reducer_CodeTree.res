@@ -3,7 +3,7 @@ module T = Reducer_CodeTree_T
 module CTV = Reducer_Extension.CodeTreeValue
 module MJ = Reducer_MathJs_Parse
 module MJT = Reducer_MathJs_ToCodeTree
-module RLE = Reducer_ListExt
+module RLE = Reducer_Extra_List
 module Rerr = Reducer_Error
 module Result = Belt.Result
 

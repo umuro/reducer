@@ -3,6 +3,8 @@ type reducerError =
 | RerrJs(option<string>, option<string>)   // Javascript Exception
 | RerrTodo(string) // To do
 | RerrUnexecutedCode( string )
+| RerrArrayIndexNotFound(string, int)
+| RerrRecordPropertyNotFound(string, string)
 
 let showError = (err) => switch err {
   | RerrTodo( msg ) => `TODO: ${msg}`
@@ -17,7 +19,9 @@ let showError = (err) => switch err {
         | _ => answer
       }
       answer
-  }
+    }
+  | RerrArrayIndexNotFound(msg, index) => `${msg}: ${Js.String.make(index)}`
+  | RerrRecordPropertyNotFound(msg, index) => `${msg}: ${index}`
   | RerrUnexecutedCode( codeString ) => `Unexecuted code remaining: ${codeString}`
   | RerrFunctionExpected( msg ) => `Function expected: ${msg}`
   }
