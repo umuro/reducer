@@ -5,6 +5,8 @@ describe("reducer using mathjs parse", () => {
   // Test the MathJs parser compatibility
   // Those tests show that there is a semantic mapping from MathJs to CodeTree
   // Reducer.parse is called by Reducer.eval
+  // See https://mathjs.org/docs/expressions/syntax.html
+  // See https://mathjs.org/docs/reference/functions.html
 
   describe("expressions", () => {
     test("1", () => expectParseToBe("1", "Ok(1)"))
@@ -40,12 +42,16 @@ describe("eval", () => {
     test("1", () => expectEvalToBe( "1", "Ok(1)"))
     test("1+2", () => expectEvalToBe( "1+2", "Ok(3)"))
     test("(1+2)*3", () => expectEvalToBe( "(1+2)*3", "Ok(9)"))
+    test("2>1", () => expectEvalToBe( "2>1", "Ok(true)"))
+    test("concat('a ', 'b')", () => expectEvalToBe( "concat('a ', 'b')", "Ok('a b')"))
+    test("log(10)", () => expectEvalToBe( "log(10)", "Ok(2.302585092994046)"))
+    test("cos(10)", () => expectEvalToBe( "cos(10)", "Ok(-0.8390715290764524)"))
     // TODO more built ins
   })
   describe("arrays", () => {
     //Note. () is a empty list in Lisp
     // The only builtin structure in Lisp is list
-    test("empty", () => expectEvalToBe( "[]", "Ok([])"))
+    test("empty array", () => expectEvalToBe( "[]", "Ok([])"))
     test("[1, 2, 3]", () => expectEvalToBe( "[1, 2, 3]", "Ok([1, 2, 3])"))
     test("['hello', 'world']", () => expectEvalToBe( "['hello', 'world']", "Ok(['hello', 'world'])"))
     test("index", () => expectEvalToBe("([0,1,2])[1]", "Ok(1)"))
