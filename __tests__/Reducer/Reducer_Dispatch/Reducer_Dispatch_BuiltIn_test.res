@@ -22,5 +22,4 @@ describe("builtin", () => {
 describe("builtin exception", () => {
   //It's a pity that MathJs does not return error position
   test("MathJs Exception", () => expectEvalToBe( "testZadanga()", "Error(JS Exception: Error: Undefined function testZadanga)"))
-  test("MathJs Exception 2", () => expectEvalToBe( "1+1i", "Error(TODO: Argg, unhandled MathJsNode: SymbolNode)"))
 })
