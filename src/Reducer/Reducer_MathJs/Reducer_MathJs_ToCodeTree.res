@@ -40,7 +40,7 @@ let rec fromNode =
       }
 
       let caseAccessorNode = ( objectNode, index ) => {
-        let lispName = "atRecordIndex" -> CTV.CtvSymbol -> CTT.CtValue
+        let lispName = "internalAtRecordIndex" -> CTV.CtvSymbol -> CTT.CtValue
         let lispIndex = index  -> CTV.CtvSymbol -> CTT.CtValue
         fromNode( objectNode )
           -> Result.map( newCode => list{lispName, newCode, lispIndex}
@@ -61,7 +61,7 @@ let rec fromNode =
                       let entryCode = list{key->CTV.CtvString->CTT.CtValue, valueCodeTree}
                         -> CTT.CtList
                       list{entryCode, ...acc}})))
-          let lispName = "constructRecord" -> CTV.CtvSymbol -> CTT.CtValue
+          let lispName = "internalConstructRecord" -> CTV.CtvSymbol -> CTT.CtValue
           rargs -> Result.map(args => list{lispName, CTT.CtList(args)} -> CTT.CtList)
         }
 
@@ -86,4 +86,6 @@ let rec fromNode =
         | MjParenthesisNode(pNode) => pNode["content"] -> fromNode
         | MjAccessorNode(aNode) => caseAccessorNode(aNode["object"], aNode["index"])
         | MjObjectNode(oNode) => caseObjectNode(oNode)
+        | MjSymbolNode(sNode) =>
+            sNode["name"]-> CTV.CtvSymbol -> CTT.CtValue -> Ok
       }})
