@@ -11,5 +11,5 @@ The Reducer is built to use different external libraries as well as different ex
 
 And finally try using Reducer.eval to how your extentions look:
 ```rescript
-  test("1+2", () => expectEvalToBe( "1+2", "Ok(3)" ) )
+  test("1+2", () => expectEvalToBe( "1+2", "Ok(3)"))
 ```
