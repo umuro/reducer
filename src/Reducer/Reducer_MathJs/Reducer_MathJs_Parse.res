@@ -2,69 +2,66 @@
   MathJs Nodes
   We make MathJs Nodes strong-typed
 */
-module AE = Reducer_ArrayExt
+module AE = Reducer_Extra_Array
 module JsG = Reducer_Js_Gate
 module Rerr = Reducer_Error
 
 type reducerError = Rerr.reducerError
 
-type node = {
+type rec node = {
   "type": string,
   "isNode": bool,
   "comment": string
 }
-//accessorNode
-//arrayNode
 type arrayNode = {
   ...node,
   "items": array<node>
 }
-external castArrayNode: node => arrayNode = "%identity"
-
 //assignmentNode
 //blockNode
 //conditionalNode
-//constantNode
 type constantNode = {
   ...node,
   "value": unit
 }
-external castConstantNode: node => constantNode = "%identity"
-
 //functionAssignmentNode
-//functionNode
 type functionNode = {
   ...node,
   "fn": string,
   "args": array<node>
 }
-external castFunctionNode: node => functionNode = "%identity"
-
 //indexNode
-//objectNode
 type objectNode = {
   ...node,
   "properties": Js.Dict.t<node>
 }
-external castObjectNode: node => objectNode = "%identity"
-//operatorNode
+type accessorNode = {
+  ...node,
+  "object": node,
+  "index": string
+}
 type operatorNode = {
   ...functionNode,
   "op": string,
 }
-external castOperatorNode: node => operatorNode = "%identity"
-external castOperatorNodeToFunctionNode: operatorNode => functionNode = "%identity"
 
 //parenthesisNode
 type parenthesisNode = {
   ...node,
   "content": node
 }
-external castParenthesisNode: node => parenthesisNode = "%identity"
-
 //rangeNode
 //relationalNode
 //symbolNode
+
+external castAccessorNode: node => accessorNode = "%identity"
+external castArrayNode: node => arrayNode = "%identity"
+external castConstantNode: node => constantNode = "%identity"
+external castFunctionNode: node => functionNode = "%identity"
+external castObjectNode: node => objectNode = "%identity"
+external castOperatorNode: node => operatorNode = "%identity"
+external castOperatorNodeToFunctionNode: operatorNode => functionNode = "%identity"
+external castParenthesisNode: node => parenthesisNode = "%identity"
 
 /*
   MathJs Parser
@@ -80,6 +77,7 @@ let parse = (expr: string): result<node, reducerError> =>
   }
 
 type mjNode =
+  | MjAccessorNode(accessorNode)
   | MjArrayNode(arrayNode)
   | MjConstantNode(constantNode)
   | MjFunctionNode(functionNode)
@@ -88,6 +86,7 @@ type mjNode =
   | MjParenthesisNode(parenthesisNode)
 
 let castNodeType = (node: node) => switch node["type"] {
+  | "AccessorNode" => node -> castAccessorNode -> MjAccessorNode -> Ok
   | "ArrayNode" => node -> castArrayNode -> MjArrayNode -> Ok
   | "ConstantNode" => node -> castConstantNode -> MjConstantNode -> Ok
   | "FunctionNode" => node -> castFunctionNode -> MjFunctionNode -> Ok
@@ -106,7 +105,7 @@ let rec show = (mjNode: mjNode): string => {
 
   let showNodeArray = (nodeArray: array<node>): string =>
     nodeArray
-    -> Belt.Array.map( a => showResult(castNodeType(a)) )
+    -> Belt.Array.map( a => showMathJsNode(a) )
     -> AE.interperse(", ")
     -> Js.String.concatMany("")
 
@@ -114,7 +113,7 @@ let rec show = (mjNode: mjNode): string => {
     `${fnode["fn"]}(${fnode["args"]->showNodeArray})`
 
   let showObjectEntry = ( (key: string, value: node) ): string =>
-    `${key}: ${value->castNodeType->showResult}`
+    `${key}: ${value->showMathJsNode}`
 
   let showObjectNode = (oNode: objectNode): string =>
     `{${  oNode["properties"]
@@ -124,17 +123,17 @@ let rec show = (mjNode: mjNode): string => {
     }}`
 
   switch mjNode {
+  | MjAccessorNode(aNode) => `${aNode["object"]->showMathJsNode}.${aNode["index"]}`
   | MjArrayNode(aNode) => `[${aNode["items"]->showNodeArray}]`
   | MjConstantNode(cNode) => cNode["value"]->showValue
   | MjObjectNode(oNode) => oNode -> showObjectNode
-  | MjParenthesisNode(pNode) => `(${showResult(castNodeType(pNode["content"]))})`
-  | MjFunctionNode(fNode) =>
-      fNode -> showFunctionNode
-  | MjOperatorNode(opNode) =>
-      opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
+  | MjParenthesisNode(pNode) => `(${showMathJsNode(pNode["content"])})`
+  | MjFunctionNode(fNode) => fNode -> showFunctionNode
+  | MjOperatorNode(opNode) => opNode -> castOperatorNodeToFunctionNode -> showFunctionNode
 }}
 and let showResult = (rmjnode: result<mjNode, reducerError>): string =>
-switch rmjnode {
-  | Error(e) => Rerr.showError(e)
-  | Ok(mjNode) => show(mjNode)
-}
+  switch rmjnode {
+    | Error(e) => Rerr.showError(e)
+    | Ok(mjNode) => show(mjNode)
+  }
+and let showMathJsNode = (node) => node -> castNodeType -> showResult
