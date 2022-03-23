@@ -1,16 +1,7 @@
-module CT = Reducer.CodeTree
-module CTV = Reducer.Extension.CodeTreeValue
-
 open Jest
-open Expect
+open Reducer_TestHelpers
 
-let expectParseToBe = (expr: string, answer: string) =>
-  Reducer.parse(expr) -> CT.showResult -> expect -> toBe(answer)
-
-let expectEvalToBe = (expr: string, answer: string) =>
-  Reducer.eval(expr) -> CTV.showResult -> expect -> toBe(answer)
-
-describe("parse", () => {
+describe("using mathjs parse", () => {
   // Test the MathJs parser compatibility
   // Those tests show that there is a semantic mapping from MathJs to CodeTree
   // Reducer.parse is called by Reducer.eval
