@@ -1,7 +1,7 @@
 open Jest
 open Reducer_TestHelpers
 
-describe("using mathjs parse", () => {
+describe("reducer using mathjs parse", () => {
   // Test the MathJs parser compatibility
   // Those tests show that there is a semantic mapping from MathJs to CodeTree
   // Reducer.parse is called by Reducer.eval
@@ -22,13 +22,12 @@ describe("using mathjs parse", () => {
     test("[1, 2, 3]", () => expectParseToBe( "[1, 2, 3]", "Ok((1 2 3))"))
     test("['hello', 'world']", () =>
       expectParseToBe( "['hello', 'world']", "Ok(('hello' 'world'))"))
-    test("index", () => expectParseToBe("([0,1,2])[1]", "Ok((:internalAtIndex (0 1 2) (1)))"))
+    test("index", () => expectParseToBe("([0,1,2])[1]", "Ok((:$atIndex (0 1 2) (1)))"))
   })
   describe("records", () => {
-    test("define", () =>
-      expectParseToBe("{a: 1, b: 2}", "Ok((:internalConstructRecord (('a' 1) ('b' 2))))"))
+    test("define", () => expectParseToBe("{a: 1, b: 2}", "Ok((:$constructRecord (('a' 1) ('b' 2))))"))
     test("use", () =>
-      expectParseToBe("record.property", "Ok((:internalAtIndex :record ('property')))"))
+      expectParseToBe("{a: 1, b: 2}.a", "Ok((:$atIndex (:$constructRecord (('a' 1) ('b' 2))) ('a')))"))
   })
 })
 
@@ -43,13 +42,23 @@ describe("eval", () => {
     test("(1+2)*3", () => expectEvalToBe( "(1+2)*3", "Ok(9)"))
     // TODO more built ins
   })
-
   describe("arrays", () => {
     //Note. () is a empty list in Lisp
     // The only builtin structure in Lisp is list
     test("empty", () => expectEvalToBe( "[]", "Ok([])"))
     test("[1, 2, 3]", () => expectEvalToBe( "[1, 2, 3]", "Ok([1, 2, 3])"))
     test("['hello', 'world']", () => expectEvalToBe( "['hello', 'world']", "Ok(['hello', 'world'])"))
+    test("index", () => expectEvalToBe("([0,1,2])[1]", "Ok(1)"))
+    test("index not found", ()
+      => expectEvalToBe("([0,1,2])[10]", "Error(Array index not found: 10)"))
+  })
+  describe("records", () => {
+    test("define", () =>
+      expectEvalToBe("{a: 1, b: 2}", "Ok({a: 1, b: 2})"))
+    test("index", () =>
+      expectEvalToBe("{a: 1}.a", "Ok(1)"))
+    test("index not found", () =>
+      expectEvalToBe("{a: 1}.b", "Error(Record property not found: b)"))
   })
 })
 

@@ -52,7 +52,7 @@ let rec fromNode =
                       let entryCode = list{key->CTV.CtvString->CTT.CtValue, valueCodeTree}
                         -> CTT.CtList
                       list{entryCode, ...acc}})))
-          let lispName = "internalConstructRecord" -> CTV.CtvSymbol -> CTT.CtValue
+          let lispName = "$constructRecord" -> CTV.CtvSymbol -> CTT.CtValue
           rargs -> Result.map(args => list{lispName, CTT.CtList(args)} -> CTT.CtList)
         }
 
@@ -79,7 +79,7 @@ let rec fromNode =
       }
 
       let caseAccessorNode = ( objectNode, indexNode ) => {
-        let fn = "internalAtIndex" -> CTV.CtvSymbol -> CTT.CtValue
+        let fn = "$atIndex" -> CTV.CtvSymbol -> CTT.CtValue
 
         caseIndexNode( indexNode ) -> Result.flatMap(
           indexCode => {
