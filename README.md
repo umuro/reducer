@@ -1,7 +1,7 @@
 # Reducer
 
 Map MathJs parse tree to LISP-like code tree and reduce (run) the code tree to an answer
-CodeTree is LISP inspired. All syntatic sugar can be mapped to LISP. Therefore MathJs becomes a complete functional programming language
+Reducer is LISP inspired. All syntactic sugar can be mapped to LISP. Therefore MathJs becomes a complete functional programming language. We reduce LISP expressions
 
 ## Installation
 
@@ -11,8 +11,8 @@ yarn install
 
 ## Build
 
--   Build: `yarn build`
--   Clean: `yarn clean`
+- Build: `yarn build`
+- Clean: `yarn clean`
 
 ## Run
 
@@ -34,26 +34,28 @@ Reducer.eval("<code>")
 ```
 
 Evaluating code returns a value of type:
+
 ```res
-Reducer_Extension.CodeTreeValue.codeTreeValue
+ReducerInterface.ExpressionValue.expressionValue
 ```
 
 External functions to the reducer are introduced in:
 
 ```res
-Reducer_Extension.ReducerLibrary
+ReducerInterface.ExternalLibrary
 ```
 
 The types in code tree value are what we need to call the external functions.
-  ReducerLibrary and CodeTreeValue are configurations of Reducer.
-  Reducer itself does not depend on external libraries.
+ExternalLibrary and ExpressionValue are configurations of Reducer.
+Reducer itself does not depend on external libraries.
 
 ## Extending the Library of Functions
-The module Reducer.Extension contains the definitions to extend it with functions.
-- Reducer.Extension.CodeTreeValue is to define new data types necessary for the functions
-- Reducer.Extension.ReducerLibrary is to add new functions to the language
-All MathJs functions are available by default
 
+The module ReducerInterface contains the definitions to extend it with functions.
+
+- ReducerInterface.ExpressionValue is to define new data types necessary for the functions
+- ReducerInterface.ExternalLibrary is to add new functions to the language
+  All MathJs functions are available by default
 
 ## Notes
 
@@ -61,27 +63,27 @@ LISP is the most basic functional language. In fact, LISP can be the assembly co
 
 Here I map MathJs parser to code tree. Thus MathJs scripts will become a complete functional language. The code tree map-reduce is in place. However, not all MathJs nodes are mapped yet. To do List:
 
--   if then else
--   arrays
--   records
--   function definition
--   variable definition
--   variable scope block
+- if then else
+- arrays
+- records
+- function definition
+- variable definition
+- variable scope block
 
 In addition to being fully functional. The current implementation is polymorphic. The original MathJs parser is not polymorphic. This protects one from writing dispatch modules and type handling while providing external libraries.
 
 Like LISP, all language features are provided by functions. If we need a language feature then it is a function. Bingo. No modification to the code tree is required.
 
-An example of polymorphic function mapping is in Reducer_Extension_ReducerLibrary.res
+An example of polymorphic function mapping is in ReducerInterface.ExternalLibrary.res
 
 An external function is called if and only if it's full type signature is matching. Thus polymorphic functions can be defined. Like
 
--   "hello " + "word"
--   1 + 2
+- "hello " + "word"
+- 1 + 2
 
 The search priority of functions will be in this order
 1\. User space. Defined in the script
-2\. Built-in extension. Special domains to extend the Reducer. Look up for a mapping in Reducer_Extension_ReducerLibrary.res
+2\. Built-in extension. Special domains to extend the Reducer. Look up for a mapping in ReducerInterface.ExternalLibrary.res
 3\. Very Basic built-ins not provided by MathJs library. If they are very basic to computer languages in general.
 4\. MathJs built-in
 
@@ -94,6 +96,7 @@ See Reducer_test.res
 ## Inheritance and Function Signatures
 
 Rescript provides Inheritance
+
 ```res
 module Base = {
   let aMethod = () => { specialMethod -> commonMethod }
@@ -117,13 +120,13 @@ To inherit or not? Are the switch statements all over the library? Then its time
 
 ## TODO
 
--   Do the first integration at Least one function
--   variable definition // bindings // execution context
+- Do the first integration at Least one function
+- variable definition // bindings // execution context
 
 ==============
 
--   if then else
--   arrays
--   records
--   variable scope block
--   function definition
+- if then else
+- arrays
+- records
+- variable scope block
+- function definition
