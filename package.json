@@ -7,7 +7,8 @@
     "start": "rescript build -w",
     "test": "jest",
     "coverage": "jest --coverage",
-    "main": "node lib/js/src/Demo.bs.js"
+    "main": "node lib/js/src/Demo.bs.js",
+    "rescript:format": "find . -type f \\( -name '*.res' -o -name '*.resi' \\) -exec sh -c 'bsc -format {} | sponge {}'  \\;"
   },
   "keywords": [
     "rescript"
@@ -15,14 +16,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "mathjs": "^10.4.0",
-    "rescript": "*"
+    "mathjs": "^10.4.1"
   },
   "devDependencies": {
     "@babel/core": "*",
     "@babel/preset-env": "*",
+    "@enspirit/rescript-prettier": "^1.0.0",
     "@glennsl/rescript-jest": "^0.9.0",
     "babel-jest": "*",
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "prettier": "2.6.1",
+    "rescript": "^9.1.4"
   }
 }
