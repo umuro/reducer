@@ -2,7 +2,7 @@
   Irreducible values. Reducer does not know about those. Only used for external calls
   This is a configuration to to make external calls of those types
 */
-module AE = Reducer_Extra_Array
+module Extra_Array = Reducer_Extra_Array
 module ErrorValue = Reducer_ErrorValue
 
 type rec expressionValue =
@@ -23,7 +23,7 @@ let rec show = aValue =>
   | EvSymbol(aString) => `:${aString}`
   | EvArray(anArray) => {
       let args =
-        anArray->Belt.Array.map(each => show(each))->AE.interperse(", ")->Js.String.concatMany("")
+        anArray->Belt.Array.map(each => show(each))->Extra_Array.interperse(", ")->Js.String.concatMany("")
       `[${args}]`
     }
   | EvRecord(aRecord) => {
@@ -31,7 +31,7 @@ let rec show = aValue =>
         aRecord
         ->Js.Dict.entries
         ->Belt.Array.map(((eachKey, eachValue)) => `${eachKey}: ${show(eachValue)}`)
-        ->AE.interperse(", ")
+        ->Extra_Array.interperse(", ")
         ->Js.String.concatMany("")
       `{${pairs}}`
     }
@@ -48,7 +48,7 @@ let showWithType = aValue =>
   }
 
 let showArgs = (args: array<expressionValue>): string => {
-  args->Belt.Array.map(arg => arg->show)->AE.interperse(", ")->Js.String.concatMany("")
+  args->Belt.Array.map(arg => arg->show)->Extra_Array.interperse(", ")->Js.String.concatMany("")
 }
 
 let showFunctionCall = ((fn, args)): string => `${fn}(${showArgs(args)})`
