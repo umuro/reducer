@@ -9,8 +9,8 @@ type expression = ExtressionT.expression
 type expressionValue = ExpressionValue.expressionValue
 type errorValue = ErrorValue.errorValue
 
-let rec fromNode = (mjnode: Parse.node): result<expression, errorValue> =>
-  Parse.castNodeType(mjnode)->Result.flatMap(typedMjNode => {
+let rec fromNode = (mathJsNode: Parse.node): result<expression, errorValue> =>
+  Parse.castNodeType(mathJsNode)->Result.flatMap(typedMjNode => {
     let fromNodeList = (nodeList: list<Parse.node>): result<list<expression>, 'e> =>
       Belt.List.reduceReverse(nodeList, Ok(list{}), (racc, currNode) =>
         racc->Result.flatMap(acc =>
